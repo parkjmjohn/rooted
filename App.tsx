@@ -1,30 +1,21 @@
-import { useState, useEffect } from 'react';
-import { supabase } from './lib/supabase';
-import Auth from './components/Auth';
-import Account from './components/Account';
-import { View } from 'react-native';
-import { Session } from '@supabase/supabase-js';
+import { Stack } from 'expo-router';
+import { useColorScheme } from 'react-native';
 
-export default function App() {
-  const [session, setSession] = useState<Session | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
+export default function RootLayout() {
+  const colorScheme = useColorScheme();
 
   return (
-    <View>
-      {session && session.user ? (
-        <Account key={session.user.id} session={session} />
-      ) : (
-        <Auth />
-      )}
-    </View>
+    <Stack
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colorScheme === 'dark' ? '#1a1a1a' : '#fff',
+        },
+        headerTintColor: colorScheme === 'dark' ? '#fff' : '#000',
+      }}
+    >
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="auth" options={{ headerShown: false }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    </Stack>
   );
 }
