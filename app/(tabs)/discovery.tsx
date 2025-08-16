@@ -1,36 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Colors } from '../../constants/Colors';
+import { View, Text } from 'react-native';
+import { useColorScheme } from 'react-native';
+import { getCommonStyles } from '../../constants/CommonStyles';
 
 export default function DiscoveryScreen() {
+  const colorScheme = useColorScheme();
+  const styles = getCommonStyles(colorScheme);
+
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
+      <View style={[styles.centered, styles.padding]}>
         <Text style={styles.title}>Discovery</Text>
         <Text style={styles.subtitle}>Find classes here</Text>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: Colors.background,
-    flex: 1,
-  },
-  content: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-  },
-  subtitle: {
-    color: Colors.textSecondary,
-    fontSize: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-});

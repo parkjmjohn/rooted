@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { Alert, StyleSheet, View, AppState } from 'react-native';
+import { Alert, View, AppState } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { Button, Input } from '@rneui/themed';
 import { useRouter } from 'expo-router';
+import { useColorScheme } from 'react-native';
+import { NavigationRoutes } from '../constants/Navigation';
+import { getCommonStyles } from '../constants/CommonStyles';
 
 // Tells Supabase Auth to continuously refresh the session automatically if
 // the app is in the foreground. When this is added, you will continue to receive
@@ -21,6 +24,8 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const styles = getCommonStyles(colorScheme);
 
   async function signInWithEmail() {
     setLoading(true);
@@ -50,8 +55,8 @@ export default function Auth() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
+    <View style={[styles.container, styles.padding, styles.marginTop]}>
+      <View style={styles.inputContainer}>
         <Input
           label="Email"
           leftIcon={{ type: 'font-awesome', name: 'envelope' }}
@@ -61,7 +66,7 @@ export default function Auth() {
           autoCapitalize={'none'}
         />
       </View>
-      <View style={styles.verticallySpaced}>
+      <View style={styles.inputContainer}>
         <Input
           label="Password"
           leftIcon={{ type: 'font-awesome', name: 'lock' }}
@@ -72,17 +77,17 @@ export default function Auth() {
           autoCapitalize={'none'}
         />
       </View>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
+      <View style={styles.buttonContainer}>
         <Button
           title="Sign in"
           disabled={loading}
           onPress={() => {
             signInWithEmail();
-            router.replace('/(tabs)/discovery');
+            router.replace(NavigationRoutes.DISCOVERY);
           }}
         />
       </View>
-      <View style={styles.verticallySpaced}>
+      <View style={styles.inputContainer}>
         <Button
           title="Sign up"
           disabled={loading}
@@ -92,18 +97,3 @@ export default function Auth() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 40,
-    padding: 12,
-  },
-  mt20: {
-    marginTop: 20,
-  },
-  verticallySpaced: {
-    alignSelf: 'stretch',
-    paddingBottom: 4,
-    paddingTop: 4,
-  },
-});

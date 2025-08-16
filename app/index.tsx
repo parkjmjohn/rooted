@@ -1,20 +1,25 @@
 import { useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useRouter } from 'expo-router';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
+import { NavigationRoutes } from '../constants/Navigation';
+import { getCommonStyles } from '../constants/CommonStyles';
+import { useColorScheme } from 'react-native';
 
 export default function Index() {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const styles = getCommonStyles(colorScheme);
 
   useEffect(() => {
     // Check if user is authenticated
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         // User is authenticated, redirect to discovery tab
-        router.replace('/discovery');
+        router.replace(NavigationRoutes.DISCOVERY);
       } else {
         // User is not authenticated, redirect to auth
-        router.replace('/auth');
+        router.replace(NavigationRoutes.AUTH);
       }
     });
 
@@ -23,9 +28,9 @@ export default function Index() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
-        router.replace('/discovery');
+        router.replace(NavigationRoutes.DISCOVERY);
       } else {
-        router.replace('/auth');
+        router.replace(NavigationRoutes.AUTH);
       }
     });
 
@@ -33,16 +38,8 @@ export default function Index() {
   }, [router]);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.loadingContainer}>
       <ActivityIndicator size="large" />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-  },
-});

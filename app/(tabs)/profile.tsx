@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../../lib/supabase';
 import { StyleSheet, View, Alert, ScrollView } from 'react-native';
 import { Button, Input } from '@rneui/themed';
 import { Session } from '@supabase/supabase-js';
-import Avatar from '../../components/Avatar';
 import { useRouter } from 'expo-router';
+
+import { supabase } from '../../lib/supabase';
+import Avatar from '../../components/Avatar';
 import { Colors } from '../../constants/Colors';
 
 export default function ProfileScreen() {
@@ -19,9 +20,9 @@ export default function ProfileScreen() {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      if (!session) {
-        router.replace('/auth');
-      }
+      // if (!session) {
+      //   router.replace('/auth');
+      // }
     });
 
     // Listen for auth changes
@@ -29,9 +30,9 @@ export default function ProfileScreen() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      if (!session) {
-        router.replace('/auth');
-      }
+      // if (!session) {
+      //   router.replace('/auth');
+      // }
     });
 
     return () => subscription.unsubscribe();
@@ -40,7 +41,7 @@ export default function ProfileScreen() {
   const getProfile = useCallback(async () => {
     try {
       setLoading(true);
-      if (!session?.user) throw new Error('No user on the session!');
+      // if (!session?.user) throw new Error('No user on the session!');
 
       const { data, error, status } = await supabase
         .from('profiles')
@@ -80,7 +81,7 @@ export default function ProfileScreen() {
   }) {
     try {
       setLoading(true);
-      if (!session?.user) throw new Error('No user on the session!');
+      // if (!session?.user) throw new Error('No user on the session!');
 
       const updates = {
         id: session?.user.id,
