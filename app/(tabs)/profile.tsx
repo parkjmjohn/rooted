@@ -1,20 +1,47 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
-import { StyleSheet, View, Alert } from 'react-native';
+import { StyleSheet, View, Alert, ScrollView } from 'react-native';
 import { Button, Input } from '@rneui/themed';
 import { Session } from '@supabase/supabase-js';
-import Avatar from './Avatar';
+import { useRouter } from 'expo-router';
 
-export default function Account({ session }: { session: Session }) {
+import { supabase } from '../../lib/supabase';
+import Avatar from '../../components/Avatar';
+import { Colors } from '../../constants/Colors';
+
+export default function ProfileScreen() {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState('');
   const [website, setWebsite] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [session, setSession] = useState<Session | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      // if (!session) {
+      //   router.replace('/auth');
+      // }
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      // if (!session) {
+      //   router.replace('/auth');
+      // }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [router]);
 
   const getProfile = useCallback(async () => {
     try {
       setLoading(true);
-      if (!session?.user) throw new Error('No user on the session!');
+      // if (!session?.user) throw new Error('No user on the session!');
 
       const { data, error, status } = await supabase
         .from('profiles')
@@ -37,7 +64,7 @@ export default function Account({ session }: { session: Session }) {
     } finally {
       setLoading(false);
     }
-  }, [session?.user]);
+  }, [session]);
 
   useEffect(() => {
     if (session) getProfile();
@@ -54,7 +81,7 @@ export default function Account({ session }: { session: Session }) {
   }) {
     try {
       setLoading(true);
-      if (!session?.user) throw new Error('No user on the session!');
+      // if (!session?.user) throw new Error('No user on the session!');
 
       const updates = {
         id: session?.user.id,
@@ -78,8 +105,24 @@ export default function Account({ session }: { session: Session }) {
     }
   }
 
+  // if (!session) {
+  //   // Redirect to auth if no session
+  //   useEffect(() => {
+  //     router.replace('/auth');
+  //   }, []);
+
+  //   return (
+  //     <View style={styles.container}>
+  //       <Text>Redirecting to login...</Text>
+  //     </View>
+  //   );
+  // }
+
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+    >
       <View>
         <Avatar
           size={200}
@@ -119,16 +162,26 @@ export default function Account({ session }: { session: Session }) {
       </View>
 
       <View style={styles.verticallySpaced}>
-        <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
+        <Button
+          title="Sign Out"
+          onPress={async () => {
+            await supabase.auth.signOut();
+            router.replace('/auth');
+          }}
+        />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 40,
+    backgroundColor: Colors.background,
+    flex: 1,
+  },
+  contentContainer: {
     padding: 12,
+    paddingBottom: 100, // Extra padding for bottom tab bar
   },
   mt20: {
     marginTop: 20,
