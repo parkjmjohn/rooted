@@ -166,7 +166,7 @@ export default function ProfileScreen() {
           title="Sign Out"
           onPress={async () => {
             await supabase.auth.signOut();
-            router.replace('/auth');
+            router.replace('/(auth)');
           }}
         />
       </View>

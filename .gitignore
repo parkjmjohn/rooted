@@ -33,9 +33,13 @@ yarn-error.*
 # local env files
 .env*.local
 .env
+.env.prod
 
 # typescript
 *.tsbuildinfo
 
 # linting
 .eslintcache
+
+# supabase 
+supabase/.temp/

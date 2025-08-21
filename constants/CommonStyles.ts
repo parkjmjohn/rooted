@@ -78,6 +78,15 @@ export const CommonStyles = StyleSheet.create({
   },
 
   // Text styles
+  text: {
+    color: Theme.colors.light.text,
+    fontSize: Theme.typography.body.fontSize,
+  },
+
+  textCenter: {
+    textAlign: 'center',
+  },
+
   title: {
     fontSize: Theme.typography.h2.fontSize,
     fontWeight: Theme.typography.h2.fontWeight,
@@ -110,6 +119,10 @@ export const getCommonStyles = (
     subtitle: {
       ...CommonStyles.subtitle,
       color: colors.textSecondary,
+    },
+    text: {
+      ...CommonStyles.text,
+      color: colors.text,
     },
   });
 };
