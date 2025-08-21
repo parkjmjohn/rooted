@@ -1,23 +1,10 @@
 import React, { useState } from 'react';
-import { Alert, View, AppState } from 'react-native';
-import { supabase } from '../lib/supabase';
+import { Alert, View } from 'react-native';
+import { supabase } from '../../lib/supabase';
 import { Button, Input } from '@rneui/themed';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from 'react-native';
-import { NavigationRoutes } from '../constants/Navigation';
-import { getCommonStyles } from '../constants/CommonStyles';
-
-// Tells Supabase Auth to continuously refresh the session automatically if
-// the app is in the foreground. When this is added, you will continue to receive
-// `onAuthStateChange` events with the `TOKEN_REFRESHED` or `SIGNED_OUT` event
-// if the user's session is terminated. This should only be registered once.
-AppState.addEventListener('change', state => {
-  if (state === 'active') {
-    supabase.auth.startAutoRefresh();
-  } else {
-    supabase.auth.stopAutoRefresh();
-  }
-});
+import { getCommonStyles } from '../../constants/CommonStyles';
 
 export default function Auth() {
   const [email, setEmail] = useState('');
@@ -29,12 +16,34 @@ export default function Auth() {
 
   async function signInWithEmail() {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
+
+    const { error, data } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     });
 
-    if (error) Alert.alert(error.message);
+    if (error) {
+      Alert.alert(error.message);
+      setLoading(false);
+      return;
+    }
+
+    // Check if user has completed onboarding
+    if (data.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('onboarding_step')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profile?.onboarding_step === 'completed') {
+        // User has completed onboarding, go to main app
+        router.replace('/(tabs)/my-classes');
+      } else {
+        // User needs to complete onboarding
+        router.replace('/(onboarding)/' + profile?.onboarding_step);
+      }
+    }
     setLoading(false);
   }
 
@@ -48,9 +57,15 @@ export default function Auth() {
       password: password,
     });
 
-    if (error) Alert.alert(error.message);
-    if (!session)
-      Alert.alert('Please check your inbox for email verification!');
+    if (error) {
+      Alert.alert(error.message);
+      setLoading(false);
+      return;
+    }
+
+    if (session) {
+      router.replace('/(onboarding)/email-verification');
+    }
     setLoading(false);
   }
 
@@ -78,14 +93,7 @@ export default function Auth() {
         />
       </View>
       <View style={styles.buttonContainer}>
-        <Button
-          title="Sign in"
-          disabled={loading}
-          onPress={() => {
-            signInWithEmail();
-            router.replace(NavigationRoutes.DISCOVERY);
-          }}
-        />
+        <Button title="Sign in" disabled={loading} onPress={signInWithEmail} />
       </View>
       <View style={styles.inputContainer}>
         <Button
