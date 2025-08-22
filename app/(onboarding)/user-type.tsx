@@ -35,7 +35,7 @@ export default function UserTypeSelection() {
       if (error) {
         Alert.alert('Error', error.message);
       } else {
-        router.replace('/(onboarding)/basic-info');
+        router.replace('/(onboarding)/basic_info');
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to update user type');

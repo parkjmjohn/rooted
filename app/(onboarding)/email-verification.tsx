@@ -23,7 +23,7 @@ export default function EmailVerification() {
         const { error } = await supabase
           .from('profiles')
           .update({
-            onboarding_step: 'user_type_selection',
+            onboarding_step: 'user_type',
           })
           .eq('id', user.id);
         if (!error) {
@@ -90,7 +90,7 @@ export default function EmailVerification() {
         </Text>
 
         <Text style={[styles.text, styles.textCenter, styles.marginBottom]}>
-          Once verified, you`&apos;`ll be able to complete your profile setup.
+          Once verified, you&apos;ll be able to complete your profile setup.
         </Text>
       </View>
 

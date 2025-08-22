@@ -1,7 +1,3 @@
--- Eco Classes App — Database Schema (Postgres/Supabase)
--- Initial migration: profiles + user_settings with requested fields
-
-
 -- =====================
 -- UTILS (helper functions)
 -- =====================
@@ -13,18 +9,19 @@ begin
 end;
 $$ language plpgsql;
 
+CREATE TYPE onboarding_step_type AS ENUM (
+  'email_verification',
+  'user_type',
+  'basic_info',
+  'location',
+  'bio',
+  'notifications',
+  'completed'
+);
+
 -- =====================
 -- PROFILES
 -- =====================
--- helper to keep updated_at fresh (must be defined BEFORE any triggers that use it)
-create or replace function public.set_current_timestamp_updated_at()
-returns trigger as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$ language plpgsql;
-
 create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   username text unique,
@@ -34,6 +31,7 @@ create table public.profiles (
   city text,
   country text,
   is_teacher boolean not null default false,
+  onboarding_step onboarding_step_type default 'email_verification',
   onboarding_completed_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
@@ -51,9 +49,14 @@ returns trigger
 set search_path = ''
 as $$
 begin
-  insert into public.profiles (id, is_teacher)
-  values (new.id, false)
+  insert into public.profiles (id)
+  values (new.id)
   on conflict (id) do nothing;
+
+  insert into public.user_settings (user_id)
+  values (new.id)
+  on conflict (user_id) do nothing;
+
   return new;
 end;
 $$ language plpgsql security definer;
@@ -67,7 +70,7 @@ create trigger on_auth_user_created
 -- =====================
 create table public.user_settings (
   user_id uuid primary key references public.profiles(id) on delete cascade,
-  push_opt_in boolean not null default true,
+  push_opt_in boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -77,7 +80,7 @@ before update on public.user_settings
 for each row execute procedure public.set_current_timestamp_updated_at();
 
 -- =====================
--- RLS POLICIES (basic)
+-- RLS POLICIES 
 -- =====================
 alter table public.profiles enable row level security;
 create policy "Public profiles are viewable by everyone." on public.profiles
