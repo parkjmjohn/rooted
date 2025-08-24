@@ -1,5 +1,7 @@
 import { Stack } from 'expo-router';
 
+import { TabNames } from '../../constants/Navigation';
+
 export default function OnboardingLayout() {
   return (
     <Stack
@@ -8,12 +10,12 @@ export default function OnboardingLayout() {
         gestureEnabled: false,
       }}
     >
-      <Stack.Screen name="email-verification" />
-      <Stack.Screen name="user-type" />
-      <Stack.Screen name="basic-info" />
-      <Stack.Screen name="location" />
-      <Stack.Screen name="bio" />
-      <Stack.Screen name="notifications" />
+      <Stack.Screen name={TabNames.EMAILVERIFICATION} />
+      <Stack.Screen name={TabNames.USERTYPE} />
+      <Stack.Screen name={TabNames.BASICINFO} />
+      <Stack.Screen name={TabNames.LOCATION} />
+      <Stack.Screen name={TabNames.BIO} />
+      <Stack.Screen name={TabNames.NOTIFICATIONS} />
     </Stack>
   );
 }

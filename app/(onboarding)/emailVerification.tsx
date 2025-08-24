@@ -2,9 +2,11 @@ import { useEffect, useState, useCallback } from 'react';
 import { View, Text, Alert, ActivityIndicator } from 'react-native';
 import { Button } from '@rneui/themed';
 import { useRouter } from 'expo-router';
+import { useColorScheme } from 'react-native';
+
 import { supabase } from '../../lib/supabase';
 import { getCommonStyles } from '../../constants/CommonStyles';
-import { useColorScheme } from 'react-native';
+import { NavigationRoutes } from '../../constants/Navigation';
 
 export default function EmailVerification() {
   const router = useRouter();
@@ -27,7 +29,7 @@ export default function EmailVerification() {
           })
           .eq('id', user.id);
         if (!error) {
-          router.replace('/(onboarding)/user-type');
+          router.replace(NavigationRoutes.USERTYPE);
         }
       }
     } catch (error) {

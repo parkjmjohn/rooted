@@ -1,21 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { View, ActivityIndicator, Text } from 'react-native';
-import { getCommonStyles } from '../constants/CommonStyles';
 import { useColorScheme } from 'react-native';
+
 import { useAuth } from '../lib/useAuth';
 import { supabase } from '../lib/supabase';
+import { getCommonStyles } from '../constants/CommonStyles';
+import { NavigationRoutes } from '../constants/Navigation';
 
 export default function Index() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const styles = getCommonStyles(colorScheme);
   const { isAuthenticated, loading: authLoading, user } = useAuth();
-  const [hasNavigated, setHasNavigated] = useState(false);
 
   useEffect(() => {
-    if (authLoading || hasNavigated) return; // Prevent multiple navigation attempts
-
     const handleNavigation = async () => {
       try {
         if (isAuthenticated && user) {
@@ -27,28 +26,24 @@ export default function Index() {
             .single();
           // User has completed onboarding, redirect to main app
           if (profile?.onboarding_completed_at) {
-            setHasNavigated(true);
-            router.replace('/(tabs)/my-classes');
+            router.replace('/(tabs)/myClasses');
           } else {
             // User needs to complete onboarding
-            setHasNavigated(true);
             router.replace('/(onboarding)/' + profile?.onboarding_step);
           }
         } else {
           // User is not authenticated, redirect to auth
-          setHasNavigated(true);
-          router.replace('/(auth)');
+          router.replace(NavigationRoutes.AUTH);
         }
       } catch (err) {
         console.error('Navigation error:', err);
         // On error, redirect to auth as fallback
-        setHasNavigated(true);
-        router.replace('/(auth)');
+        router.replace(NavigationRoutes.AUTH);
       }
     };
 
     handleNavigation();
-  }, [isAuthenticated, authLoading, user, hasNavigated, router]);
+  }, [isAuthenticated, authLoading, user, router]);
 
   if (authLoading) {
     return (

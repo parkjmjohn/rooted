@@ -82,7 +82,7 @@ export default function NotificationsSetup() {
       }
 
       // Navigate to main app
-      router.replace('/(tabs)/my-classes');
+      router.replace('/(tabs)/myClasses');
     } catch (error) {
       Alert.alert('Error', 'Failed to complete onboarding');
       console.log(error);
@@ -130,7 +130,7 @@ export default function NotificationsSetup() {
       }
 
       // Navigate to main app
-      router.replace('/(tabs)/my-classes');
+      router.replace('/(tabs)/myClasses');
     } catch (error) {
       Alert.alert('Error', 'Failed to complete onboarding');
       console.log(error);

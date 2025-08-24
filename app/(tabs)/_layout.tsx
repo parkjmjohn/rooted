@@ -10,12 +10,12 @@ export default function TabLayout() {
   return (
     <Tabs screenOptions={getTabBarStyles(colorScheme)}>
       <Tabs.Screen
-        name={TabNames.MY_CLASSES}
+        name={TabNames.MYCLASSES}
         options={{
-          title: TabTitles[TabNames.MY_CLASSES],
+          title: TabTitles[TabNames.MYCLASSES],
           tabBarIcon: ({ color, size }) => (
             <Ionicons
-              name={TabIcons[TabNames.MY_CLASSES]}
+              name={TabIcons[TabNames.MYCLASSES]}
               size={size}
               color={color}
             />

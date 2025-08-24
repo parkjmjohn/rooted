@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, Alert } from 'react-native';
-import { supabase } from '../../lib/supabase';
 import { Button } from '@rneui/themed';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from 'react-native';
+
+import { supabase } from '../../lib/supabase';
 import { getCommonStyles } from '../../constants/CommonStyles';
+import { NavigationRoutes } from '../../constants/Navigation';
 
 export default function UserTypeSelection() {
   const [loading, setLoading] = useState(false);
@@ -35,7 +37,7 @@ export default function UserTypeSelection() {
       if (error) {
         Alert.alert('Error', error.message);
       } else {
-        router.replace('/(onboarding)/basic_info');
+        router.replace(NavigationRoutes.BASICINFO);
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to update user type');

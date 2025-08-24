@@ -2,8 +2,10 @@ import { Stack } from 'expo-router';
 import { useColorScheme } from 'react-native';
 import { useEffect } from 'react';
 import { AppState } from 'react-native';
+
 import { supabase } from './lib/supabase';
 import { useAuth } from './lib/useAuth';
+import { Sections } from './constants/Navigation';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -51,11 +53,11 @@ export default function RootLayout() {
     >
       {/* Public routes - always accessible */}
       <Stack.Screen name="index" />
-      <Stack.Screen name="(auth)" />
+      <Stack.Screen name={Sections.auth} />
       {/* Protected routes - only accessible when authenticated */}
       <Stack.Protected guard={isAuthenticated}>
-        <Stack.Screen name="(onboarding)" />
-        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name={Sections.onboarding} />
+        <Stack.Screen name={Sections.tabs} />
       </Stack.Protected>
     </Stack>
   );

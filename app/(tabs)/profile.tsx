@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import Avatar from '../../components/Avatar';
 import { Colors } from '../../constants/Colors';
+import { NavigationRoutes } from '../../constants/Navigation';
 
 export default function ProfileScreen() {
   const [loading, setLoading] = useState(true);
@@ -20,9 +21,6 @@ export default function ProfileScreen() {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      // if (!session) {
-      //   router.replace('/auth');
-      // }
     });
 
     // Listen for auth changes
@@ -30,9 +28,6 @@ export default function ProfileScreen() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      // if (!session) {
-      //   router.replace('/auth');
-      // }
     });
 
     return () => subscription.unsubscribe();
@@ -105,19 +100,6 @@ export default function ProfileScreen() {
     }
   }
 
-  // if (!session) {
-  //   // Redirect to auth if no session
-  //   useEffect(() => {
-  //     router.replace('/auth');
-  //   }, []);
-
-  //   return (
-  //     <View style={styles.container}>
-  //       <Text>Redirecting to login...</Text>
-  //     </View>
-  //   );
-  // }
-
   return (
     <ScrollView
       style={styles.container}
@@ -166,7 +148,7 @@ export default function ProfileScreen() {
           title="Sign Out"
           onPress={async () => {
             await supabase.auth.signOut();
-            router.replace('/(auth)');
+            router.replace(NavigationRoutes.AUTH);
           }}
         />
       </View>

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, Alert } from 'react-native';
-import { supabase } from '../../lib/supabase';
 import { Button, Input } from '@rneui/themed';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from 'react-native';
+
+import { supabase } from '../../lib/supabase';
 import { getCommonStyles } from '../../constants/CommonStyles';
+import { NavigationRoutes } from '../../constants/Navigation';
 
 export default function BasicInfo() {
   const [fullName, setFullName] = useState('');
@@ -55,7 +57,7 @@ export default function BasicInfo() {
           Alert.alert('Error', error.message);
         }
       } else {
-        router.replace('/(onboarding)/location');
+        router.replace(NavigationRoutes.LOCATION);
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to update profile');
@@ -69,7 +71,7 @@ export default function BasicInfo() {
     <View style={[styles.container, styles.padding, styles.marginTop]}>
       <View style={styles.inputContainer}>
         <Text style={[styles.text, styles.textCenter, styles.marginBottom]}>
-          Let`&apos;`s get to know you better
+          Let&apos;s get to know you better
         </Text>
 
         <Text style={[styles.text, styles.textCenter, styles.marginBottom]}>

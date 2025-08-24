@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Alert, View } from 'react-native';
-import { supabase } from '../../lib/supabase';
 import { Button, Input } from '@rneui/themed';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from 'react-native';
+
+import { supabase } from '../../lib/supabase';
+import { NavigationRoutes } from '../../constants/Navigation';
 import { getCommonStyles } from '../../constants/CommonStyles';
 
 export default function Auth() {
@@ -38,7 +40,7 @@ export default function Auth() {
 
       if (profile?.onboarding_step === 'completed') {
         // User has completed onboarding, go to main app
-        router.replace('/(tabs)/my-classes');
+        router.replace(NavigationRoutes.MYCLASSES);
       } else {
         // User needs to complete onboarding
         router.replace('/(onboarding)/' + profile?.onboarding_step);
@@ -64,7 +66,7 @@ export default function Auth() {
     }
 
     if (session) {
-      router.replace('/(onboarding)/email-verification');
+      router.replace(NavigationRoutes.EMAILVERIFICATION);
     }
     setLoading(false);
   }

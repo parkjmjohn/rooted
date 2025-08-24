@@ -4,7 +4,9 @@ import { supabase } from '../../lib/supabase';
 import { Button, Input } from '@rneui/themed';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from 'react-native';
+
 import { getCommonStyles } from '../../constants/CommonStyles';
+import { NavigationRoutes } from '../../constants/Navigation';
 
 export default function Bio() {
   const [bio, setBio] = useState('');
@@ -46,7 +48,7 @@ export default function Bio() {
       if (error) {
         Alert.alert('Error', error.message);
       } else {
-        router.replace('/(onboarding)/notifications');
+        router.replace(NavigationRoutes.NOTIFICATIONS);
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to update profile');
@@ -64,7 +66,7 @@ export default function Bio() {
         </Text>
 
         <Text style={[styles.text, styles.textCenter, styles.marginBottom]}>
-          Share a bit about your interests, experience, or what you`&apos;`re
+          Share a bit about your interests, experience, or what you&apos;re
           looking for
         </Text>
       </View>
