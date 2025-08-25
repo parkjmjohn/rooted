@@ -15,6 +15,9 @@ export default function Index() {
   const { isAuthenticated, loading: authLoading, user } = useAuth();
 
   useEffect(() => {
+    if (authLoading) {
+      return;
+    }
     const handleNavigation = async () => {
       try {
         if (isAuthenticated && user) {
@@ -45,7 +48,7 @@ export default function Index() {
     };
 
     handleNavigation();
-  }, [isAuthenticated, authLoading, user, router]);
+  }, [authLoading, isAuthenticated, user, router]);
 
   if (authLoading) {
     return (

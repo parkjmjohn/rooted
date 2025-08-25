@@ -9,7 +9,7 @@ import { Sections } from './constants/Navigation';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   // Handle Supabase auth token refresh based on app state
   useEffect(() => {
@@ -36,10 +36,6 @@ export default function RootLayout() {
       supabase.auth.stopAutoRefresh();
     };
   }, []);
-
-  if (loading) {
-    return null; // Or a loading screen
-  }
 
   return (
     <Stack
