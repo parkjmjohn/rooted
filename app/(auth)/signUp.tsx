@@ -68,6 +68,12 @@ export default function SignOut() {
           onPress={() => signUpWithEmail()}
         />
       </View>
+      <View style={styles.inputContainer}>
+        <Button
+          title="Back"
+          onPress={() => router.replace(NavigationRoutes.AUTH)}
+        />
+      </View>
     </View>
   );
 }

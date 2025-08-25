@@ -77,6 +77,12 @@ export default function SignIn() {
       <View style={styles.buttonContainer}>
         <Button title="Sign in" disabled={loading} onPress={signInWithEmail} />
       </View>
+      <View style={styles.inputContainer}>
+        <Button
+          title="Back"
+          onPress={() => router.replace(NavigationRoutes.AUTH)}
+        />
+      </View>
     </View>
   );
 }

@@ -11,7 +11,7 @@ export default function AuthLayout() {
     >
       <Stack.Screen name="index" />
       <Stack.Screen name={NavigationRoutes.SIGNIN} />
-      <Stack.Screen name={NavigationRoutes.SIGNOUT} />
+      <Stack.Screen name={NavigationRoutes.SIGNUP} />
     </Stack>
   );
 }
