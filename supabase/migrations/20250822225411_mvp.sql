@@ -1,7 +1,3 @@
--- Eco Classes App — Database Schema (Postgres/Supabase)
--- Initial migration: profiles + user_settings with requested fields
-
-
 -- =====================
 -- UTILS (helper functions)
 -- =====================
@@ -13,18 +9,19 @@ begin
 end;
 $$ language plpgsql;
 
+CREATE TYPE onboarding_step_type AS ENUM (
+  'email_verification',
+  'user_type',
+  'basic_info',
+  'location',
+  'bio',
+  'notifications',
+  'completed'
+);
+
 -- =====================
 -- PROFILES
 -- =====================
--- helper to keep updated_at fresh (must be defined BEFORE any triggers that use it)
-create or replace function public.set_current_timestamp_updated_at()
-returns trigger as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$ language plpgsql;
-
 create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   username text unique,
@@ -34,26 +31,44 @@ create table public.profiles (
   city text,
   country text,
   is_teacher boolean not null default false,
+  onboarding_step onboarding_step_type default 'email_verification',
   onboarding_completed_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint username_length check (char_length(username) >= 3)
 );
 
--- trigger to keep updated_at fresh
 create trigger set_profiles_updated_at
 before update on public.profiles
 for each row execute procedure public.set_current_timestamp_updated_at();
 
--- auto-insert a profile row when a new user signs up via Supabase Auth
+-- =====================
+-- USER SETTINGS
+-- =====================
+create table public.user_settings (
+  user_id uuid primary key references public.profiles(id) on delete cascade,
+  push_opt_in boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create trigger set_user_settings_updated_at
+before update on public.user_settings
+for each row execute procedure public.set_current_timestamp_updated_at();
+
 create function public.handle_new_user()
 returns trigger
 set search_path = ''
 as $$
 begin
-  insert into public.profiles (id, is_teacher)
-  values (new.id, false)
+  insert into public.profiles (id)
+  values (new.id)
   on conflict (id) do nothing;
+
+  insert into public.user_settings (user_id)
+  values (new.id)
+  on conflict (user_id) do nothing;
+
   return new;
 end;
 $$ language plpgsql security definer;
@@ -63,21 +78,7 @@ create trigger on_auth_user_created
   for each row execute procedure public.handle_new_user();
 
 -- =====================
--- USER SETTINGS
--- =====================
-create table public.user_settings (
-  user_id uuid primary key references public.profiles(id) on delete cascade,
-  push_opt_in boolean not null default true,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create trigger set_user_settings_updated_at
-before update on public.user_settings
-for each row execute procedure public.set_current_timestamp_updated_at();
-
--- =====================
--- RLS POLICIES (basic)
+-- RLS POLICIES 
 -- =====================
 alter table public.profiles enable row level security;
 create policy "Public profiles are viewable by everyone." on public.profiles

@@ -1,56 +1,53 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { View, ActivityIndicator, Text } from 'react-native';
-import { getCommonStyles } from '../constants/CommonStyles';
 import { useColorScheme } from 'react-native';
-import { useAuth } from '../lib/useAuth';
-import { supabase } from '../lib/supabase';
+
+import { useAppSelector } from '../lib/store';
+import { getCommonStyles } from '../constants/CommonStyles';
+import { Sections, NavigationRoutes } from '../constants/Navigation';
 
 export default function Index() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const styles = getCommonStyles(colorScheme);
-  const { isAuthenticated, loading: authLoading, user } = useAuth();
-  const [hasNavigated, setHasNavigated] = useState(false);
+  const { user, initializing } = useAppSelector(s => s.auth);
+  const profile = useAppSelector(s => s.profile.profile);
 
   useEffect(() => {
-    if (authLoading || hasNavigated) return; // Prevent multiple navigation attempts
-
+    if (initializing) {
+      return;
+    }
     const handleNavigation = async () => {
       try {
-        if (isAuthenticated && user) {
-          // User is authenticated, check onboarding status
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('onboarding_completed_at, onboarding_step')
-            .eq('id', user.id)
-            .single();
-          // User has completed onboarding, redirect to main app
+        if (user) {
+          // User is authenticated; use profile in store to route
           if (profile?.onboarding_completed_at) {
-            setHasNavigated(true);
-            router.replace('/(tabs)/my-classes');
+            router.replace(NavigationRoutes.MYCLASSES);
           } else {
             // User needs to complete onboarding
-            setHasNavigated(true);
-            router.replace('/(onboarding)/' + profile?.onboarding_step);
+            router.replace(
+              '/' +
+                Sections.onboarding +
+                '/' +
+                (profile?.onboarding_step ?? 'emailVerification')
+            );
           }
         } else {
           // User is not authenticated, redirect to auth
-          setHasNavigated(true);
-          router.replace('/(auth)');
+          router.replace(NavigationRoutes.AUTH);
         }
       } catch (err) {
         console.error('Navigation error:', err);
         // On error, redirect to auth as fallback
-        setHasNavigated(true);
-        router.replace('/(auth)');
+        router.replace(NavigationRoutes.AUTH);
       }
     };
 
     handleNavigation();
-  }, [isAuthenticated, authLoading, user, hasNavigated, router]);
+  }, [initializing, user, profile, router]);
 
-  if (authLoading) {
+  if (initializing) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" />
