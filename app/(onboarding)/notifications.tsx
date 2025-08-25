@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Alert } from 'react-native';
-import { supabase } from '../../lib/supabase';
 import { Button } from '@rneui/themed';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from 'react-native';
-import { getCommonStyles } from '../../constants/CommonStyles';
 import * as Notifications from 'expo-notifications';
+
+import { supabase } from '../../lib/supabase';
+import { getCommonStyles } from '../../constants/CommonStyles';
+import { NavigationRoutes } from '../../constants/Navigation';
 
 export default function NotificationsSetup() {
   const [loading, setLoading] = useState(false);
@@ -82,7 +84,7 @@ export default function NotificationsSetup() {
       }
 
       // Navigate to main app
-      router.replace('/(tabs)/myClasses');
+      router.replace(NavigationRoutes.MYCLASSES);
     } catch (error) {
       Alert.alert('Error', 'Failed to complete onboarding');
       console.log(error);
@@ -130,7 +132,7 @@ export default function NotificationsSetup() {
       }
 
       // Navigate to main app
-      router.replace('/(tabs)/myClasses');
+      router.replace(NavigationRoutes.MYCLASSES);
     } catch (error) {
       Alert.alert('Error', 'Failed to complete onboarding');
       console.log(error);

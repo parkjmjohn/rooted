@@ -1,5 +1,7 @@
 import { Stack } from 'expo-router';
 
+import { NavigationRoutes } from '../../constants/Navigation';
+
 export default function AuthLayout() {
   return (
     <Stack
@@ -8,6 +10,8 @@ export default function AuthLayout() {
       }}
     >
       <Stack.Screen name="index" />
+      <Stack.Screen name={NavigationRoutes.SIGNIN} />
+      <Stack.Screen name={NavigationRoutes.SIGNOUT} />
     </Stack>
   );
 }

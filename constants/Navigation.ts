@@ -5,6 +5,9 @@ export const Sections = {
 } as const;
 
 export const TabNames = {
+  SIGNIN: 'signIn',
+  SIGNOUT: 'signOut',
+
   MYCLASSES: 'myClasses',
   DISCOVERY: 'discovery',
   MESSAGING: 'messaging',
@@ -21,6 +24,8 @@ export const TabNames = {
 export const NavigationRoutes = {
   // Auth routes
   AUTH: '/' + Sections.auth,
+  SIGNIN: '/' + Sections.auth + '/' + TabNames.SIGNIN,
+  SIGNOUT: '/' + Sections.auth + '/' + TabNames.SIGNOUT,
 
   // Tab routes
   MYCLASSES: '/' + Sections.tabs + '/' + TabNames.MYCLASSES,

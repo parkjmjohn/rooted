@@ -6,7 +6,7 @@ import { useColorScheme } from 'react-native';
 import { useAuth } from '../lib/useAuth';
 import { supabase } from '../lib/supabase';
 import { getCommonStyles } from '../constants/CommonStyles';
-import { NavigationRoutes } from '../constants/Navigation';
+import { Sections, NavigationRoutes } from '../constants/Navigation';
 
 export default function Index() {
   const router = useRouter();
@@ -26,10 +26,12 @@ export default function Index() {
             .single();
           // User has completed onboarding, redirect to main app
           if (profile?.onboarding_completed_at) {
-            router.replace('/(tabs)/myClasses');
+            router.replace(NavigationRoutes.MYCLASSES);
           } else {
             // User needs to complete onboarding
-            router.replace('/(onboarding)/' + profile?.onboarding_step);
+            router.replace(
+              '/' + Sections.onboarding + '/' + profile?.onboarding_step
+            );
           }
         } else {
           // User is not authenticated, redirect to auth

@@ -11,9 +11,12 @@ import { NavigationRoutes } from '../../constants/Navigation';
 
 export default function ProfileScreen() {
   const [loading, setLoading] = useState(true);
+  const [name, setName] = useState('');
   const [username, setUsername] = useState('');
-  const [website, setWebsite] = useState('');
+  const [bio, setBio] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [city, setCity] = useState('');
+  const [country, setCountry] = useState('');
   const [session, setSession] = useState<Session | null>(null);
   const router = useRouter();
 
@@ -36,21 +39,26 @@ export default function ProfileScreen() {
   const getProfile = useCallback(async () => {
     try {
       setLoading(true);
-      // if (!session?.user) throw new Error('No user on the session!');
 
       const { data, error, status } = await supabase
         .from('profiles')
-        .select(`username, website, avatar_url`)
+        .select(
+          `full_name, username, avatar_url, bio, city, country, is_teacher`
+        )
         .eq('id', session?.user.id)
         .single();
+
       if (error && status !== 406) {
         throw error;
       }
 
       if (data) {
+        setName(data.full_name);
         setUsername(data.username);
-        setWebsite(data.website);
+        setBio(data.bio);
         setAvatarUrl(data.avatar_url);
+        setCity(data.city);
+        setCountry(data.country);
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -66,23 +74,28 @@ export default function ProfileScreen() {
   }, [session, getProfile]);
 
   async function updateProfile({
+    name,
     username,
-    website,
     avatar_url,
+    city,
+    country,
   }: {
+    name: string;
     username: string;
-    website: string;
     avatar_url: string;
+    city: string;
+    country: string;
   }) {
     try {
       setLoading(true);
-      // if (!session?.user) throw new Error('No user on the session!');
 
       const updates = {
         id: session?.user.id,
+        name,
         username,
-        website,
         avatar_url,
+        city,
+        country,
         updated_at: new Date(),
       };
 
@@ -111,12 +124,19 @@ export default function ProfileScreen() {
           url={avatarUrl}
           onUpload={(url: string) => {
             setAvatarUrl(url);
-            updateProfile({ username, website, avatar_url: url });
+            updateProfile({ name, username, city, country, avatar_url: url });
           }}
         />
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Input label="Email" value={session?.user?.email} disabled />
+      </View>
+      <View style={styles.verticallySpaced}>
+        <Input
+          label="Name"
+          value={name || ''}
+          onChangeText={(text: string) => setName(text)}
+        />
       </View>
       <View style={styles.verticallySpaced}>
         <Input
@@ -127,9 +147,23 @@ export default function ProfileScreen() {
       </View>
       <View style={styles.verticallySpaced}>
         <Input
-          label="Website"
-          value={website || ''}
-          onChangeText={(text: string) => setWebsite(text)}
+          label="Bio"
+          value={bio || ''}
+          onChangeText={(text: string) => setBio(text)}
+        />
+      </View>
+      <View style={styles.verticallySpaced}>
+        <Input
+          label="City"
+          value={city || ''}
+          onChangeText={(text: string) => setCity(text)}
+        />
+      </View>
+      <View style={styles.verticallySpaced}>
+        <Input
+          label="Country"
+          value={country || ''}
+          onChangeText={(text: string) => setCountry(text)}
         />
       </View>
 
@@ -137,7 +171,13 @@ export default function ProfileScreen() {
         <Button
           title={loading ? 'Loading ...' : 'Update'}
           onPress={() =>
-            updateProfile({ username, website, avatar_url: avatarUrl })
+            updateProfile({
+              name,
+              username,
+              city,
+              country,
+              avatar_url: avatarUrl,
+            })
           }
           disabled={loading}
         />

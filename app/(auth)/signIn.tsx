@@ -8,7 +8,7 @@ import { supabase } from '../../lib/supabase';
 import { Sections, NavigationRoutes } from '../../constants/Navigation';
 import { getCommonStyles } from '../../constants/CommonStyles';
 
-export default function Auth() {
+export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -51,28 +51,6 @@ export default function Auth() {
     setLoading(false);
   }
 
-  async function signUpWithEmail() {
-    setLoading(true);
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
-
-    if (error) {
-      Alert.alert(error.message);
-      setLoading(false);
-      return;
-    }
-
-    if (session) {
-      router.replace(NavigationRoutes.EMAILVERIFICATION);
-    }
-    setLoading(false);
-  }
-
   return (
     <View style={[styles.container, styles.padding, styles.marginTop]}>
       <View style={styles.inputContainer}>
@@ -98,13 +76,6 @@ export default function Auth() {
       </View>
       <View style={styles.buttonContainer}>
         <Button title="Sign in" disabled={loading} onPress={signInWithEmail} />
-      </View>
-      <View style={styles.inputContainer}>
-        <Button
-          title="Sign up"
-          disabled={loading}
-          onPress={() => signUpWithEmail()}
-        />
       </View>
     </View>
   );

@@ -4,6 +4,8 @@ import { supabase } from '../../lib/supabase';
 import { Button, Input } from '@rneui/themed';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from 'react-native';
+
+import { NavigationRoutes } from '../../constants/Navigation';
 import { getCommonStyles } from '../../constants/CommonStyles';
 
 export default function Location() {
@@ -43,7 +45,7 @@ export default function Location() {
       if (error) {
         Alert.alert('Error', error.message);
       } else {
-        router.replace('/(onboarding)/bio');
+        router.replace(NavigationRoutes.BIO);
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to update profile');

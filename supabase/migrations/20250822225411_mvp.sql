@@ -38,12 +38,24 @@ create table public.profiles (
   constraint username_length check (char_length(username) >= 3)
 );
 
--- trigger to keep updated_at fresh
 create trigger set_profiles_updated_at
 before update on public.profiles
 for each row execute procedure public.set_current_timestamp_updated_at();
 
--- auto-insert a profile row when a new user signs up via Supabase Auth
+-- =====================
+-- USER SETTINGS
+-- =====================
+create table public.user_settings (
+  user_id uuid primary key references public.profiles(id) on delete cascade,
+  push_opt_in boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create trigger set_user_settings_updated_at
+before update on public.user_settings
+for each row execute procedure public.set_current_timestamp_updated_at();
+
 create function public.handle_new_user()
 returns trigger
 set search_path = ''
@@ -64,20 +76,6 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
-
--- =====================
--- USER SETTINGS
--- =====================
-create table public.user_settings (
-  user_id uuid primary key references public.profiles(id) on delete cascade,
-  push_opt_in boolean not null default false,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create trigger set_user_settings_updated_at
-before update on public.user_settings
-for each row execute procedure public.set_current_timestamp_updated_at();
 
 -- =====================
 -- RLS POLICIES 
