@@ -6,7 +6,7 @@ export default function OnboardingLayout() {
   return (
     <Stack
       screenOptions={{
-        headerShown: false,
+        headerShown: true,
         gestureEnabled: false,
       }}
     >

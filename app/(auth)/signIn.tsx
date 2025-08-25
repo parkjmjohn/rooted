@@ -4,51 +4,30 @@ import { Button, Input } from '@rneui/themed';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from 'react-native';
 
-import { supabase } from '../../lib/supabase';
-import { Sections, NavigationRoutes } from '../../constants/Navigation';
+import { useAppDispatch, useAppSelector } from '../../lib/store';
+import { signInWithEmail } from '../../lib/store/slices/authSlice';
+import { NavigationRoutes } from '../../constants/Navigation';
 import { getCommonStyles } from '../../constants/CommonStyles';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const loading = useAppSelector(s => s.auth.loading);
   const router = useRouter();
   const colorScheme = useColorScheme();
   const styles = getCommonStyles(colorScheme);
 
-  async function signInWithEmail() {
-    setLoading(true);
-
-    const { error, data } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
-
-    if (error) {
-      Alert.alert(error.message);
-      setLoading(false);
+  async function handleSignIn() {
+    const result = await dispatch(
+      signInWithEmail({ email: email, password: password })
+    );
+    if (signInWithEmail.rejected.match(result)) {
+      const msg = (result.payload as string) ?? 'Failed to sign in';
+      Alert.alert(msg);
       return;
     }
-
-    // Check if user has completed onboarding
-    if (data.user) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('onboarding_step')
-        .eq('id', data.user.id)
-        .single();
-
-      if (profile?.onboarding_step === 'completed') {
-        // User has completed onboarding, go to main app
-        router.replace(NavigationRoutes.MYCLASSES);
-      } else {
-        // User needs to complete onboarding
-        router.replace(
-          '/' + Sections.onboarding + '/' + profile?.onboarding_step
-        );
-      }
-    }
-    setLoading(false);
+    router.replace(NavigationRoutes.MYCLASSES);
   }
 
   return (
@@ -75,9 +54,9 @@ export default function SignIn() {
         />
       </View>
       <View style={styles.buttonContainer}>
-        <Button title="Sign in" disabled={loading} onPress={signInWithEmail} />
+        <Button title="Sign in" disabled={loading} onPress={handleSignIn} />
       </View>
-      <View style={styles.inputContainer}>
+      <View style={styles.buttonContainer}>
         <Button
           title="Back"
           onPress={() => router.replace(NavigationRoutes.AUTH)}

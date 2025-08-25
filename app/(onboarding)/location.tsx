@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Alert } from 'react-native';
-import { supabase } from '../../lib/supabase';
+import { useAppDispatch, useAppSelector } from '../../lib/store';
+import { upsertProfile } from '../../lib/store/slices/profileSlice';
 import { Button, Input } from '@rneui/themed';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from 'react-native';
@@ -12,6 +13,8 @@ export default function Location() {
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('');
   const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(s => s.auth.user);
   const router = useRouter();
   const colorScheme = useColorScheme();
   const styles = getCommonStyles(colorScheme);
@@ -24,26 +27,21 @@ export default function Location() {
 
     setLoading(true);
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
+      if (!user?.id) {
         Alert.alert('Error', 'User not found');
         return;
       }
-
-      const { error } = await supabase
-        .from('profiles')
-        .update({
+      const result = await dispatch(
+        upsertProfile({
+          id: user.id,
           city: city.trim(),
           country: country.trim(),
           onboarding_step: 'bio',
         })
-        .eq('id', user.id);
-
-      if (error) {
-        Alert.alert('Error', error.message);
+      );
+      if (upsertProfile.rejected.match(result)) {
+        const msg = (result.payload as string) ?? 'Failed to update profile';
+        Alert.alert('Error', msg);
       } else {
         router.replace(NavigationRoutes.BIO);
       }

@@ -1,15 +1,33 @@
 import { Stack } from 'expo-router';
-import { useColorScheme } from 'react-native';
 import { useEffect } from 'react';
-import { AppState } from 'react-native';
+import { useColorScheme, AppState } from 'react-native';
+import { Provider } from 'react-redux';
 
-import { supabase } from './lib/supabase';
-import { useAuth } from './lib/useAuth';
-import { Sections } from './constants/Navigation';
+import { Sections } from '../constants/Navigation';
+import { store, useAppDispatch, useAppSelector, RootState } from '../lib/store';
+import {
+  initSession,
+  listenToAuthChanges,
+} from '../lib/store/slices/authSlice';
+import { fetchProfile } from '../lib/store/slices/profileSlice';
+import { supabase } from '../lib/supabase';
 
-export default function RootLayout() {
+function RootNavigator() {
   const colorScheme = useColorScheme();
-  const { isAuthenticated } = useAuth();
+  const dispatch = useAppDispatch();
+  const isAuthenticated = useAppSelector((s: RootState) => !!s.auth.user);
+  const userId = useAppSelector((s: RootState) => s.auth.user?.id ?? null);
+
+  useEffect(() => {
+    dispatch(initSession());
+    dispatch(listenToAuthChanges());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (userId) {
+      dispatch(fetchProfile(userId));
+    }
+  }, [dispatch, userId]);
 
   // Handle Supabase auth token refresh based on app state
   useEffect(() => {
@@ -21,7 +39,6 @@ export default function RootLayout() {
       }
     };
 
-    // Add event listener for app state changes
     const subscription = AppState.addEventListener(
       'change',
       handleAppStateChange
@@ -30,7 +47,6 @@ export default function RootLayout() {
     // Start auto refresh initially
     supabase.auth.startAutoRefresh();
 
-    // Cleanup function
     return () => {
       subscription?.remove();
       supabase.auth.stopAutoRefresh();
@@ -47,14 +63,20 @@ export default function RootLayout() {
         headerTintColor: colorScheme === 'dark' ? '#fff' : '#000',
       }}
     >
-      {/* Public routes - always accessible */}
       <Stack.Screen name="index" />
       <Stack.Screen name={Sections.auth} />
-      {/* Protected routes - only accessible when authenticated */}
       <Stack.Protected guard={isAuthenticated}>
         <Stack.Screen name={Sections.onboarding} />
         <Stack.Screen name={Sections.tabs} />
       </Stack.Protected>
     </Stack>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <Provider store={store}>
+      <RootNavigator />
+    </Provider>
   );
 }

@@ -4,38 +4,30 @@ import { Button, Input } from '@rneui/themed';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from 'react-native';
 
-import { supabase } from '../../lib/supabase';
+import { useAppDispatch, useAppSelector } from '../../lib/store';
+import { signUpWithEmail } from '../../lib/store/slices/authSlice';
 import { NavigationRoutes } from '../../constants/Navigation';
 import { getCommonStyles } from '../../constants/CommonStyles';
 
-export default function SignOut() {
+export default function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const loading = useAppSelector(s => s.auth.loading);
   const router = useRouter();
   const colorScheme = useColorScheme();
   const styles = getCommonStyles(colorScheme);
 
-  async function signUpWithEmail() {
-    setLoading(true);
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
-
-    if (error) {
-      Alert.alert(error.message);
-      setLoading(false);
+  async function handleSignUp() {
+    const result = await dispatch(
+      signUpWithEmail({ email: email, password: password })
+    );
+    if (signUpWithEmail.rejected.match(result)) {
+      const msg = (result.payload as string) ?? 'Failed to sign up';
+      Alert.alert(msg);
       return;
     }
-
-    if (session) {
-      router.replace(NavigationRoutes.EMAILVERIFICATION);
-    }
-    setLoading(false);
+    router.replace(NavigationRoutes.EMAILVERIFICATION);
   }
 
   return (
@@ -61,14 +53,10 @@ export default function SignOut() {
           autoCapitalize={'none'}
         />
       </View>
-      <View style={styles.inputContainer}>
-        <Button
-          title="Sign up"
-          disabled={loading}
-          onPress={() => signUpWithEmail()}
-        />
+      <View style={styles.buttonContainer}>
+        <Button title="Sign up" disabled={loading} onPress={handleSignUp} />
       </View>
-      <View style={styles.inputContainer}>
+      <View style={styles.buttonContainer}>
         <Button
           title="Back"
           onPress={() => router.replace(NavigationRoutes.AUTH)}

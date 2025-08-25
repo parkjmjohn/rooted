@@ -20,7 +20,7 @@ export default function Auth() {
           onPress={() => router.replace(NavigationRoutes.SIGNIN)}
         />
       </View>
-      <View style={styles.inputContainer}>
+      <View style={styles.buttonContainer}>
         <Button
           title="Sign up"
           onPress={() => router.replace(NavigationRoutes.SIGNUP)}

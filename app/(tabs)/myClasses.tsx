@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '../../constants/Colors';
+import { Theme } from '../../constants/Theme';
 
 export default function MyClassesScreen() {
   return (
@@ -22,15 +23,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    padding: 20,
+    padding: Theme.spacing.xl,
   },
   subtitle: {
     color: Colors.textSecondary,
     fontSize: 16,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: Theme.typography.h2.fontSize,
+    fontWeight: Theme.typography.h2.fontWeight,
+    marginBottom: Theme.spacing.sm,
   },
 });

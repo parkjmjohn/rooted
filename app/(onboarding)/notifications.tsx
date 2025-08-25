@@ -8,12 +8,16 @@ import * as Notifications from 'expo-notifications';
 import { supabase } from '../../lib/supabase';
 import { getCommonStyles } from '../../constants/CommonStyles';
 import { NavigationRoutes } from '../../constants/Navigation';
+import { useAppDispatch, useAppSelector } from '../../lib/store';
+import { upsertProfile } from '../../lib/store/slices/profileSlice';
 
 export default function NotificationsSetup() {
   const [loading, setLoading] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<
     boolean | null
   >(null);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(s => s.auth.user);
   const router = useRouter();
   const colorScheme = useColorScheme();
   const styles = getCommonStyles(colorScheme);
@@ -48,26 +52,21 @@ export default function NotificationsSetup() {
   const completeOnboarding = async () => {
     setLoading(true);
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
+      if (!user?.id) {
         Alert.alert('Error', 'User not found');
         return;
       }
-
-      // Update profile to mark onboarding as completed
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
+      const result = await dispatch(
+        upsertProfile({
+          id: user.id,
           onboarding_step: 'completed',
           onboarding_completed_at: new Date().toISOString(),
         })
-        .eq('id', user.id);
-
-      if (profileError) {
-        Alert.alert('Error', profileError.message);
+      );
+      if (upsertProfile.rejected.match(result)) {
+        const msg =
+          (result.payload as string) ?? 'Failed to complete onboarding';
+        Alert.alert('Error', msg);
         return;
       }
 
@@ -96,26 +95,21 @@ export default function NotificationsSetup() {
   const skipNotifications = async () => {
     setLoading(true);
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
+      if (!user?.id) {
         Alert.alert('Error', 'User not found');
         return;
       }
-
-      // Update profile to mark onboarding as completed
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
+      const result = await dispatch(
+        upsertProfile({
+          id: user.id,
           onboarding_step: 'completed',
           onboarding_completed_at: new Date().toISOString(),
         })
-        .eq('id', user.id);
-
-      if (profileError) {
-        Alert.alert('Error', profileError.message);
+      );
+      if (upsertProfile.rejected.match(result)) {
+        const msg =
+          (result.payload as string) ?? 'Failed to complete onboarding';
+        Alert.alert('Error', msg);
         return;
       }
 

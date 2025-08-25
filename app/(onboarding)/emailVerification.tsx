@@ -7,6 +7,9 @@ import { useColorScheme } from 'react-native';
 import { supabase } from '../../lib/supabase';
 import { getCommonStyles } from '../../constants/CommonStyles';
 import { NavigationRoutes } from '../../constants/Navigation';
+import { useAppDispatch, useAppSelector } from '../../lib/store';
+import { refreshUser } from '../../lib/store/slices/authSlice';
+import { upsertProfile } from '../../lib/store/slices/profileSlice';
 
 export default function EmailVerification() {
   const router = useRouter();
@@ -14,21 +17,22 @@ export default function EmailVerification() {
   const styles = getCommonStyles(colorScheme);
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(false);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(s => s.auth.user);
 
   const checkEmailVerification = useCallback(async () => {
     setChecking(true);
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user?.email_confirmed_at) {
-        const { error } = await supabase
-          .from('profiles')
-          .update({
-            onboarding_step: 'user_type',
-          })
-          .eq('id', user.id);
-        if (!error) {
+      const result = await dispatch(refreshUser());
+      if (refreshUser.fulfilled.match(result)) {
+        const refreshedUser = result.payload;
+        if (refreshedUser?.email_confirmed_at) {
+          await dispatch(
+            upsertProfile({
+              id: refreshedUser.id,
+              onboarding_step: 'user_type',
+            })
+          );
           router.replace(NavigationRoutes.USERTYPE);
         }
       }
@@ -37,7 +41,7 @@ export default function EmailVerification() {
     } finally {
       setChecking(false);
     }
-  }, [router]);
+  }, [dispatch, router]);
 
   useEffect(() => {
     // Check if user is already verified
@@ -47,12 +51,7 @@ export default function EmailVerification() {
   const resendVerificationEmail = async () => {
     setLoading(true);
     try {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-
-      if (userError || !user?.email) {
+      if (!user?.email) {
         Alert.alert('Error', 'Unable to retrieve user email.');
         return;
       }
