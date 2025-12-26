@@ -12,7 +12,11 @@ export default function Index() {
   const colorScheme = useColorScheme();
   const styles = getCommonStyles(colorScheme);
   const { user, initializing } = useAppSelector(s => s.auth);
-  const profile = useAppSelector(s => s.profile.profile);
+  const {
+    profile,
+    loading: profileLoading,
+    hasFetched,
+  } = useAppSelector(s => s.profile);
 
   useEffect(() => {
     if (initializing) {
@@ -21,11 +25,13 @@ export default function Index() {
     const handleNavigation = async () => {
       try {
         if (user) {
-          // User is authenticated; use profile in store to route
+          // Wait until profile fetch has completed at least once
+          if (!hasFetched || profileLoading) {
+            return;
+          }
           if (profile?.onboarding_completed_at) {
             router.replace(NavigationRoutes.MYCLASSES);
           } else {
-            // User needs to complete onboarding
             router.replace(
               '/' +
                 Sections.onboarding +
@@ -45,9 +51,9 @@ export default function Index() {
     };
 
     handleNavigation();
-  }, [initializing, user, profile, router]);
+  }, [initializing, user, profile, hasFetched, profileLoading, router]);
 
-  if (initializing) {
+  if (initializing || (user && (!hasFetched || profileLoading))) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" />
