@@ -10,38 +10,12 @@ export default function TabLayout() {
   return (
     <Tabs screenOptions={getTabBarStyles(colorScheme)}>
       <Tabs.Screen
-        name={TabNames.MYCLASSES}
+        name={TabNames.ACTIVITIES}
         options={{
-          title: TabTitles[TabNames.MYCLASSES],
+          title: TabTitles[TabNames.ACTIVITIES],
           tabBarIcon: ({ color, size }) => (
             <Ionicons
-              name={TabIcons[TabNames.MYCLASSES]}
-              size={size}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name={TabNames.DISCOVERY}
-        options={{
-          title: TabTitles[TabNames.DISCOVERY],
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons
-              name={TabIcons[TabNames.DISCOVERY]}
-              size={size}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name={TabNames.MESSAGING}
-        options={{
-          title: TabTitles[TabNames.MESSAGING],
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons
-              name={TabIcons[TabNames.MESSAGING]}
+              name={TabIcons[TabNames.ACTIVITIES]}
               size={size}
               color={color}
             />

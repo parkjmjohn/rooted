@@ -3,12 +3,12 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '../../constants/Colors';
 import { Theme } from '../../constants/Theme';
 
-export default function MessagingScreen() {
+export default function ActivitiesScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Messages</Text>
-        <Text style={styles.subtitle}>Send and receive messages</Text>
+        <Text style={styles.title}>Activities</Text>
+        <Text style={styles.subtitle}>Find and view your activities</Text>
       </View>
     </View>
   );

@@ -30,7 +30,7 @@ export default function Index() {
             return;
           }
           if (profile?.onboarding_completed_at) {
-            router.replace(NavigationRoutes.MYCLASSES);
+            router.replace(NavigationRoutes.ACTIVITIES);
           } else {
             router.replace(
               '/' +

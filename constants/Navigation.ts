@@ -8,9 +8,7 @@ export const TabNames = {
   SIGNIN: 'signIn',
   SIGNUP: 'signUp',
 
-  MYCLASSES: 'myClasses',
-  DISCOVERY: 'discovery',
-  MESSAGING: 'messaging',
+  ACTIVITIES: 'activities',
   PROFILE: 'profile',
 
   EMAILVERIFICATION: 'emailVerification',
@@ -28,9 +26,7 @@ export const NavigationRoutes = {
   SIGNUP: '/' + Sections.auth + '/' + TabNames.SIGNUP,
 
   // Tab routes
-  MYCLASSES: '/' + Sections.tabs + '/' + TabNames.MYCLASSES,
-  DISCOVERY: '/' + Sections.tabs + '/' + TabNames.DISCOVERY,
-  MESSAGING: '/' + Sections.tabs + '/' + TabNames.MESSAGING,
+  ACTIVITIES: '/' + Sections.tabs + '/' + TabNames.ACTIVITIES,
   PROFILE: '/' + Sections.tabs + '/' + TabNames.PROFILE,
 
   // Onboarding Routes
@@ -44,18 +40,14 @@ export const NavigationRoutes = {
 } as const;
 
 export const TabTitles = {
-  [TabNames.MYCLASSES]: 'My Classes',
-  [TabNames.DISCOVERY]: 'Discovery',
-  [TabNames.MESSAGING]: 'Messages',
+  [TabNames.ACTIVITIES]: 'Activities',
   [TabNames.PROFILE]: 'Profile',
 } as const;
 
 // Define the specific icon names that Ionicons supports
 export const TabIcons = {
-  [TabNames.DISCOVERY]: 'search' as const,
-  [TabNames.MYCLASSES]: 'calendar' as const,
-  [TabNames.MESSAGING]: 'chatbubbles' as const,
-  [TabNames.PROFILE]: 'person' as const,
+  [TabNames.ACTIVITIES]: 'walk-outline' as const,
+  [TabNames.PROFILE]: 'person-outline' as const,
 } as const;
 
 // Create a union type of all valid icon names
