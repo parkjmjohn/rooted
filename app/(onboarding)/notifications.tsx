@@ -83,7 +83,7 @@ export default function NotificationsSetup() {
       }
 
       // Navigate to main app
-      router.replace(NavigationRoutes.MYCLASSES);
+      router.replace(NavigationRoutes.ACTIVITIES);
     } catch (error) {
       Alert.alert('Error', 'Failed to complete onboarding');
       console.log(error);
@@ -126,7 +126,7 @@ export default function NotificationsSetup() {
       }
 
       // Navigate to main app
-      router.replace(NavigationRoutes.MYCLASSES);
+      router.replace(NavigationRoutes.ACTIVITIES);
     } catch (error) {
       Alert.alert('Error', 'Failed to complete onboarding');
       console.log(error);

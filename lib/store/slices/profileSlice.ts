@@ -29,12 +29,14 @@ interface ProfileState {
   loading: boolean;
   error: string | null;
   profile: Profile | null;
+  hasFetched: boolean;
 }
 
 const initialState: ProfileState = {
   loading: false,
   error: null,
   profile: null,
+  hasFetched: false,
 };
 
 export const fetchProfile = createAsyncThunk<
@@ -95,6 +97,7 @@ const profileSlice = createSlice({
       .addCase(fetchProfile.pending, state => {
         state.loading = true;
         state.error = null;
+        state.hasFetched = true;
       })
       .addCase(fetchProfile.fulfilled, (state, action) => {
         state.loading = false;

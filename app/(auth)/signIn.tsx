@@ -27,7 +27,7 @@ export default function SignIn() {
       Alert.alert(msg);
       return;
     }
-    router.replace(NavigationRoutes.MYCLASSES);
+    router.replace(NavigationRoutes.ACTIVITIES);
   }
 
   return (
