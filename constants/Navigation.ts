@@ -12,7 +12,6 @@ export const TabNames = {
   PROFILE: 'profile',
 
   EMAILVERIFICATION: 'emailVerification',
-  USERTYPE: 'userType',
   BASICINFO: 'basicInfo',
   LOCATION: 'location',
   BIO: 'bio',
@@ -32,7 +31,6 @@ export const NavigationRoutes = {
   // Onboarding Routes
   EMAILVERIFICATION:
     '/' + Sections.onboarding + '/' + TabNames.EMAILVERIFICATION,
-  USERTYPE: '/' + Sections.onboarding + '/' + TabNames.USERTYPE,
   BASICINFO: '/' + Sections.onboarding + '/' + TabNames.BASICINFO,
   LOCATION: '/' + Sections.onboarding + '/' + TabNames.LOCATION,
   BIO: '/' + Sections.onboarding + '/' + TabNames.BIO,

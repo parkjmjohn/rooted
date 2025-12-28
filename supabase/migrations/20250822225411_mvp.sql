@@ -28,12 +28,6 @@ create type public.activity_sport as enum (
   'mountain biking'
 );
 
-create type public.activity_group as enum (
-  'open',
-  'women-only',
-  'non-binary-only'
-);
-
 -- =====================
 -- PROFILES
 -- =====================
@@ -78,13 +72,8 @@ create table public.activities (
   time timestamptz not null,
   completed boolean not null default false,
   details text,
-  groups public.activity_group not null default 'open',
-  group_size integer,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  constraint activity_group_size_positive check (
-    group_size is null or group_size > 0
-  )
+  updated_at timestamptz not null default now()
 );
 
 -- =====================
@@ -145,20 +134,6 @@ create policy "User can view own settings" on public.user_settings
 create policy "User can upsert own settings" on public.user_settings
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
--- =====================
--- STORAGE (avatars)
--- =====================
-insert into storage.buckets (id, name)
-  values ('avatars', 'avatars')
-  on conflict (id) do nothing;
-
-create policy "Avatar images are publicly accessible." on storage.objects
-  for select using (bucket_id = 'avatars');
-create policy "Anyone can upload an avatar." on storage.objects
-  for insert with check (bucket_id = 'avatars');
-create policy "Anyone can update their own avatar." on storage.objects
-  for update using ((select auth.uid()) = owner) with check (bucket_id = 'avatars');
-
 alter table public.activities enable row level security;
 create policy "Activities are viewable by authenticated users" on public.activities
   for select using (auth.role() = 'authenticated');
@@ -174,3 +149,17 @@ create policy "Users can join activities as themselves" on public.activity_parti
   for insert with check (auth.uid() = user_id);
 create policy "Users can leave activities they joined" on public.activity_participants
   for delete using (auth.uid() = user_id);
+
+-- =====================
+-- STORAGE (avatars)
+-- =====================
+insert into storage.buckets (id, name)
+  values ('avatars', 'avatars')
+  on conflict (id) do nothing;
+
+create policy "Avatar images are publicly accessible." on storage.objects
+  for select using (bucket_id = 'avatars');
+create policy "Anyone can upload an avatar." on storage.objects
+  for insert with check (bucket_id = 'avatars');
+create policy "Anyone can update their own avatar." on storage.objects
+  for update using ((select auth.uid()) = owner) with check (bucket_id = 'avatars');

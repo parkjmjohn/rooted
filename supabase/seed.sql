@@ -166,9 +166,7 @@ insert into public.activities (
   sport,
   time,
   completed,
-  details,
-  groups,
-  group_size
+  details
 ) values
 -- Upcoming (hosted by John)
 (
@@ -178,9 +176,7 @@ insert into public.activities (
   'running',
   now() + interval '1 day',
   false,
-  'Easy pace, all levels welcome.',
-  'open',
-  8
+  'Easy pace, all levels welcome.'
 ),
 
 -- Upcoming (hosted by Alice)
@@ -191,9 +187,7 @@ insert into public.activities (
   'trail running',
   now() + interval '2 days',
   false,
-  'Hilly route, bring water.',
-  'women-only',
-  6
+  'Hilly route, bring water.'
 ),
 
 -- Upcoming (hosted by Sam)
@@ -204,9 +198,7 @@ insert into public.activities (
   'gravel biking',
   now() + interval '4 days',
   false,
-  'Mixed terrain, moderate pace.',
-  'open',
-  10
+  'Mixed terrain, moderate pace.'
 ),
 
 -- Past activity (should NOT appear)
@@ -217,9 +209,7 @@ insert into public.activities (
   'hiking',
   now() - interval '2 days',
   true,
-  'Chill evening hike.',
-  'open',
-  12
+  'Chill evening hike.'
 ),
 
 -- Upcoming but small group
@@ -230,9 +220,7 @@ insert into public.activities (
   'mountain biking',
   now() + interval '6 days',
   false,
-  'Inclusive ride, intermediate trails.',
-  'non-binary-only',
-  5
+  'Inclusive ride, intermediate trails.'
 );
 
 -- ======================================

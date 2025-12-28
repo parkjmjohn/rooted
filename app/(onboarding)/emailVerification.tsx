@@ -33,7 +33,7 @@ export default function EmailVerification() {
               onboarding_step: 'user_type',
             })
           );
-          router.replace(NavigationRoutes.USERTYPE);
+          router.replace(NavigationRoutes.BASICINFO);
         }
       }
     } catch (error) {
