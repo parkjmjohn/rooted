@@ -19,6 +19,15 @@ CREATE TYPE onboarding_step_type AS ENUM (
   'completed'
 );
 
+create type public.activity_sport as enum (
+  'running',
+  'trail running',
+  'hiking',
+  'road biking',
+  'gravel biking',
+  'mountain biking'
+);
+
 -- =====================
 -- PROFILES
 -- =====================
@@ -52,8 +61,39 @@ create table public.user_settings (
   updated_at timestamptz not null default now()
 );
 
+-- =====================
+-- ACTIVITIES
+-- =====================
+create table public.activities (
+  id uuid primary key default gen_random_uuid(),
+  host_id uuid not null references public.profiles(id) on delete cascade,
+  name text not null,
+  sport public.activity_sport not null,
+  time timestamptz not null,
+  completed boolean not null default false,
+  details text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- =====================
+-- ACTIVITY PARTICIPANTS
+-- =====================
+create table public.activity_participants (
+  activity_id uuid not null references public.activities(id) on delete cascade,
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  role text not null default 'participant',
+  joined_at timestamptz not null default now(),
+  primary key (activity_id, user_id),
+  constraint activity_role_check check (role in ('host', 'participant'))
+);
+
 create trigger set_user_settings_updated_at
 before update on public.user_settings
+for each row execute procedure public.set_current_timestamp_updated_at();
+
+create trigger set_activities_updated_at
+before update on public.activities
 for each row execute procedure public.set_current_timestamp_updated_at();
 
 create function public.handle_new_user()
@@ -93,6 +133,22 @@ create policy "User can view own settings" on public.user_settings
   for select using (auth.uid() = user_id);
 create policy "User can upsert own settings" on public.user_settings
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+alter table public.activities enable row level security;
+create policy "Activities are viewable by authenticated users" on public.activities
+  for select using (auth.role() = 'authenticated');
+create policy "Users can create activities they host" on public.activities
+  for insert with check (auth.uid() = host_id);
+create policy "Hosts can update their activities" on public.activities
+  for update using (auth.uid() = host_id);
+
+alter table public.activity_participants enable row level security;
+create policy "Participants are viewable by authenticated users" on public.activity_participants
+  for select using (auth.role() = 'authenticated');
+create policy "Users can join activities as themselves" on public.activity_participants
+  for insert with check (auth.uid() = user_id);
+create policy "Users can leave activities they joined" on public.activity_participants
+  for delete using (auth.uid() = user_id);
 
 -- =====================
 -- STORAGE (avatars)

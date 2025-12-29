@@ -10,4 +10,5 @@ export const Colors = {
   success: '#34C759',
   error: '#FF3B30',
   warning: '#FF9500',
+  overlay: 'rgba(0,0,0,0.35)',
 };

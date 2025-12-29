@@ -11,7 +11,6 @@ export default function OnboardingLayout() {
       }}
     >
       <Stack.Screen name={TabNames.EMAILVERIFICATION} />
-      <Stack.Screen name={TabNames.USERTYPE} />
       <Stack.Screen name={TabNames.BASICINFO} />
       <Stack.Screen name={TabNames.LOCATION} />
       <Stack.Screen name={TabNames.BIO} />
