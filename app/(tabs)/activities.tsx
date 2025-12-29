@@ -16,8 +16,10 @@ import {
 } from '../../lib/activities';
 import { Activity } from '../../lib/types/activity';
 import { useAppSelector } from '../../lib/store';
+import { Button } from '@rneui/themed';
 import ActivitySection from '../../components/ActivitySection';
 import ActivityCard from '../../components/ActivityCard';
+import ActivityModal from '../../components/ActivityModal';
 
 const ActivitiesScreen = () => {
   const userId = useAppSelector(s => s.auth.user?.id);
@@ -25,6 +27,7 @@ const ActivitiesScreen = () => {
   const [activityId, setActivityId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const loadActivities = async () => {
     setLoading(true);
@@ -100,13 +103,42 @@ const ActivitiesScreen = () => {
     }
   };
 
+  const handleCreated = (activity: Activity) => {
+    setActivities(prev => [activity, ...prev]);
+  };
+
+  if (!userId) {
+    return (
+      <View style={styles.container}>
+        <Text style={[styles.title, { marginTop: Theme.spacing.xl }]}>
+          Activities
+        </Text>
+        <Text style={styles.subtitle}>
+          Sign in to browse or host an activity.
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
+      <ActivityModal
+        visible={modalVisible}
+        hostId={userId}
+        onClose={() => setModalVisible(false)}
+        onCreated={handleCreated}
+      />
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>Activities</Text>
-          <Text style={styles.subtitle}>Find a meetup or host your own</Text>
+          <Text style={styles.subtitle}>Upcoming and joinable activities</Text>
         </View>
+        <Button
+          title="New"
+          onPress={() => setModalVisible(true)}
+          type="outline"
+          buttonStyle={styles.headerButton}
+        />
       </View>
       {loading ? (
         <View style={styles.loadingContainer}>
@@ -167,6 +199,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: Theme.spacing.md,
+  },
+  headerButton: {
+    paddingHorizontal: Theme.spacing.md,
   },
   loadingContainer: {
     alignItems: 'center',

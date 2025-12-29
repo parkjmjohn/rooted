@@ -1,5 +1,9 @@
 import { supabase } from './supabase';
-import { Activity, ActivityParticipant } from './types/activity';
+import {
+  Activity,
+  ActivityParticipant,
+  CreateActivityPayload,
+} from './types/activity';
 
 const ACTIVITY_SELECT = `
   id,
@@ -39,64 +43,61 @@ export const fetchUpcomingActivities = async (): Promise<Activity[]> => {
   return (data as ActivityRow[]).map(mapActivity);
 };
 
-// export const fetchActivityById = async (
-//   id: string
-// ): Promise<Activity | null> => {
-//   const { data, error } = await supabase
-//     .from('activities')
-//     .select(ACTIVITY_SELECT)
-//     .eq('id', id)
-//     .single();
+export const fetchActivityById = async (
+  id: string
+): Promise<Activity | null> => {
+  const { data, error } = await supabase
+    .from('activities')
+    .select(ACTIVITY_SELECT)
+    .eq('id', id)
+    .single();
 
-//   if (error) {
-//     throw new Error(error.message);
-//   }
+  if (error) {
+    throw new Error(error.message);
+  }
 
-//   return data ? mapActivity(data as ActivityRow) : null;
-// };
+  return data ? mapActivity(data as ActivityRow) : null;
+};
 
-// export const createActivity = async (
-//   payload: CreateActivityPayload,
-//   hostId: string
-// ): Promise<Activity> => {
-//   const { data, error } = await supabase
-//     .from('activities')
-//     .insert({
-//       ...payload,
-//       host_id: hostId,
-//       groups: payload.groups ?? 'open',
-//       age_range: payload.age_range ?? 'open',
-//       time_flex: payload.time_flex ?? false,
-//       completed: false,
-//     })
-//     .select('id')
-//     .single();
+export const createActivity = async (
+  payload: CreateActivityPayload,
+  hostId: string
+): Promise<Activity> => {
+  const { data, error } = await supabase
+    .from('activities')
+    .insert({
+      ...payload,
+      host_id: hostId,
+      completed: false,
+    })
+    .select('id')
+    .single();
 
-//   if (error) {
-//     throw new Error(error.message);
-//   }
+  if (error) {
+    throw new Error(error.message);
+  }
 
-//   const activityId = (data as { id: string }).id;
+  const activityId = (data as { id: string }).id;
 
-//   const { error: participantError } = await supabase
-//     .from('activity_participants')
-//     .upsert({
-//       activity_id: activityId,
-//       user_id: hostId,
-//       role: 'host',
-//     });
+  const { error: participantError } = await supabase
+    .from('activity_participants')
+    .upsert({
+      activity_id: activityId,
+      user_id: hostId,
+      role: 'host',
+    });
 
-//   if (participantError) {
-//     console.warn('Failed to record host as participant', participantError);
-//   }
+  if (participantError) {
+    console.warn('Failed to record host as participant', participantError);
+  }
 
-//   const activity = await fetchActivityById(activityId);
-//   if (!activity) {
-//     throw new Error('Failed to load the newly created activity');
-//   }
+  const activity = await fetchActivityById(activityId);
+  if (!activity) {
+    throw new Error('Failed to load the newly created activity');
+  }
 
-//   return activity;
-// };
+  return activity;
+};
 
 export const joinActivity = async (
   activityId: string,

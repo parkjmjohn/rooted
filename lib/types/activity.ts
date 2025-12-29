@@ -29,6 +29,7 @@ export interface Activity {
 export interface CreateActivityPayload {
   name: string;
   sport: ActivitySport;
+  time: string;
   details?: string | null;
 }
 
