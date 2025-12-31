@@ -7,6 +7,8 @@ import {
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
+import { Button } from '@rneui/themed';
+
 import { Colors } from '../../constants/Colors';
 import { Theme } from '../../constants/Theme';
 import {
@@ -16,10 +18,10 @@ import {
 } from '../../lib/activities';
 import { Activity } from '../../lib/types/activity';
 import { useAppSelector } from '../../lib/store';
-import { Button } from '@rneui/themed';
 import ActivitySection from '../../components/ActivitySection';
 import ActivityCard from '../../components/ActivityCard';
 import ActivityModal from '../../components/ActivityModal';
+import ActivityDetailsModal from '../../components/activities/ActivityDetailsModal';
 
 const ActivitiesScreen = () => {
   const userId = useAppSelector(s => s.auth.user?.id);
@@ -28,6 +30,8 @@ const ActivitiesScreen = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [detailsActivity, setDetailsActivity] = useState<Activity | null>(null);
+  const [detailsVisible, setDetailsVisible] = useState(false);
 
   const loadActivities = async () => {
     setLoading(true);
@@ -107,6 +111,16 @@ const ActivitiesScreen = () => {
     setActivities(prev => [activity, ...prev]);
   };
 
+  const openDetails = (activity: Activity) => {
+    setDetailsActivity(activity);
+    setDetailsVisible(true);
+  };
+
+  const closeDetails = () => {
+    setDetailsVisible(false);
+    setDetailsActivity(null);
+  };
+
   if (!userId) {
     return (
       <View style={styles.container}>
@@ -127,6 +141,11 @@ const ActivitiesScreen = () => {
         hostId={userId}
         onClose={() => setModalVisible(false)}
         onCreated={handleCreated}
+      />
+      <ActivityDetailsModal
+        visible={detailsVisible}
+        activity={detailsActivity}
+        onClose={closeDetails}
       />
       <View style={styles.header}>
         <View>
@@ -161,6 +180,7 @@ const ActivitiesScreen = () => {
                 joining={false}
                 onJoin={handleJoin}
                 onLeave={handleLeave}
+                onPress={() => openDetails(activity)}
               />
             )}
           />
@@ -175,6 +195,7 @@ const ActivitiesScreen = () => {
                 joining={activityId === activity.id}
                 onJoin={handleJoin}
                 onLeave={handleLeave}
+                onPress={() => openDetails(activity)}
               />
             )}
           />

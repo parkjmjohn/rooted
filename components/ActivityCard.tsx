@@ -1,5 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  GestureResponderEvent,
+} from 'react-native';
 import { Button } from '@rneui/themed';
 
 import { Colors } from '../constants/Colors';
@@ -12,6 +18,7 @@ interface ActivityCardProps {
   joining: boolean;
   onJoin: (activity: Activity) => void;
   onLeave: (activity: Activity) => void;
+  onPress?: (event: GestureResponderEvent) => void;
 }
 
 const ActivityCard: React.FC<ActivityCardProps> = ({
@@ -20,33 +27,40 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
   joining,
   onJoin,
   onLeave,
+  onPress,
 }) => {
   return (
-    <View style={styles.card}>
-      <Text style={styles.activityName}>{activity.name}</Text>
-      <Text style={styles.meta}>{activity.sport}</Text>
-      {activity.details ? (
-        <Text style={styles.details}>{activity.details}</Text>
-      ) : null}
-      {showJoin ? (
-        <View style={styles.cardActions}>
-          <Button
-            title={'Join activity'}
-            type="outline"
-            onPress={() => onJoin(activity)}
-            disabled={joining}
-          />
-        </View>
-      ) : (
-        <View style={styles.cardActions}>
-          <Button
-            title={'Leave activity'}
-            type="outline"
-            onPress={() => onLeave(activity)}
-          />
-        </View>
-      )}
-    </View>
+    <TouchableOpacity
+      disabled={!onPress}
+      activeOpacity={onPress ? 0.75 : 1}
+      onPress={onPress}
+    >
+      <View style={styles.card}>
+        <Text style={styles.activityName}>{activity.name}</Text>
+        <Text style={styles.meta}>{activity.sport}</Text>
+        {activity.details ? (
+          <Text style={styles.details}>{activity.details}</Text>
+        ) : null}
+        {showJoin ? (
+          <View style={styles.cardActions}>
+            <Button
+              title={'Join activity'}
+              type="outline"
+              onPress={() => onJoin(activity)}
+              disabled={joining}
+            />
+          </View>
+        ) : (
+          <View style={styles.cardActions}>
+            <Button
+              title={'Leave activity'}
+              type="outline"
+              onPress={() => onLeave(activity)}
+            />
+          </View>
+        )}
+      </View>
+    </TouchableOpacity>
   );
 };
 
