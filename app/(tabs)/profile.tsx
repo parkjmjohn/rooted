@@ -3,7 +3,7 @@ import { StyleSheet, View, Alert, ScrollView } from 'react-native';
 import { Button, Input } from '@rneui/themed';
 import { useRouter } from 'expo-router';
 
-import Avatar from '../../components/Avatar';
+import Avatar from '../../components/avatar/Avatar';
 import { Colors } from '../../constants/Colors';
 import { Theme } from '../../constants/Theme';
 import { NavigationRoutes } from '../../constants/Navigation';

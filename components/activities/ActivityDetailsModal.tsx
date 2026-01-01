@@ -12,6 +12,8 @@ import { Button } from '@rneui/themed';
 import { Colors } from '../../constants/Colors';
 import { Theme } from '../../constants/Theme';
 import { Activity } from '../../lib/types/activity';
+import { formatDateTime } from '../../lib/utils/formatDateTime';
+import ParticipantAvatarStack from '../avatar/ParticipantAvatarStack';
 
 interface ActivityDetailsModalProps {
   visible: boolean;
@@ -19,18 +21,10 @@ interface ActivityDetailsModalProps {
   onClose: () => void;
   onJoin: (activity: Activity) => void;
   onLeave: (activity: Activity) => void;
+  onEdit?: (activity: Activity) => void;
   userId: string | null;
   actionActivityId: string | null;
 }
-
-const formatDateTime = (value: string) =>
-  new Date(value).toLocaleString(undefined, {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 
 const ActivityDetailsModal: React.FC<ActivityDetailsModalProps> = ({
   visible,
@@ -38,6 +32,7 @@ const ActivityDetailsModal: React.FC<ActivityDetailsModalProps> = ({
   onClose,
   onJoin,
   onLeave,
+  onEdit,
   userId,
   actionActivityId,
 }) => {
@@ -75,6 +70,11 @@ const ActivityDetailsModal: React.FC<ActivityDetailsModalProps> = ({
               <Text style={styles.close}>Close</Text>
             </TouchableOpacity>
           </View>
+          <View style={styles.avatarRow}>
+            <ParticipantAvatarStack
+              participants={activity.activity_participants}
+            />
+          </View>
 
           <ScrollView
             contentContainerStyle={styles.body}
@@ -84,7 +84,7 @@ const ActivityDetailsModal: React.FC<ActivityDetailsModalProps> = ({
             <Text style={styles.value}>{activity.sport}</Text>
 
             <Text style={styles.label}>When</Text>
-
+            <Text style={styles.value}>{formatDateTime(activity.time)}</Text>
             <Text style={styles.label}>Details</Text>
             <Text style={styles.value}>
               {activity.details ?? 'No additional details provided.'}
@@ -98,6 +98,15 @@ const ActivityDetailsModal: React.FC<ActivityDetailsModalProps> = ({
 
           {showActionButton && (
             <View style={styles.actions}>
+              {isHost && onEdit && (
+                <Button
+                  title="Edit event"
+                  type="outline"
+                  onPress={() => onEdit(activity)}
+                  disabled={actionInProgress}
+                  buttonStyle={styles.secondaryButton}
+                />
+              )}
               <Button
                 title={actionLabel}
                 type={actionType}
@@ -118,6 +127,10 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.border,
     borderTopWidth: 1,
     padding: Theme.spacing.md,
+  },
+  avatarRow: {
+    paddingHorizontal: Theme.spacing.md,
+    paddingTop: Theme.spacing.sm,
   },
   backdrop: {
     alignItems: 'center',
@@ -152,6 +165,9 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     fontSize: Theme.typography.caption.fontSize,
     marginTop: Theme.spacing.md,
+  },
+  secondaryButton: {
+    marginBottom: Theme.spacing.sm,
   },
   title: {
     fontSize: Theme.typography.h3.fontSize,

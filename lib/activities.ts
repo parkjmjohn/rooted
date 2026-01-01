@@ -3,6 +3,7 @@ import {
   Activity,
   ActivityParticipant,
   CreateActivityPayload,
+  ParticipantProfile,
 } from './types/activity';
 
 const ACTIVITY_SELECT = `
@@ -15,17 +16,35 @@ const ACTIVITY_SELECT = `
   details,
   created_at,
   updated_at,
-  activity_participants(user_id, role, joined_at)
+  activity_participants(
+    user_id,
+    role,
+    joined_at,
+    profiles (
+      id,
+      full_name,
+      username,
+      avatar_url
+    )
+  )
 `;
 
+type ActivityParticipantRow = Omit<ActivityParticipant, 'profile'> & {
+  profiles?: ParticipantProfile[];
+};
+
 type ActivityRow = Omit<Activity, 'activity_participants'> & {
-  activity_participants?: ActivityParticipant[];
+  activity_participants?: ActivityParticipantRow[];
 };
 
 const mapActivity = (row: ActivityRow): Activity => ({
   ...row,
   details: row.details ?? null,
-  activity_participants: row.activity_participants ?? [],
+  activity_participants:
+    row.activity_participants?.map(({ profiles, ...participant }) => ({
+      ...participant,
+      profile: Array.isArray(profiles) ? profiles[0] : profiles,
+    })) ?? [],
 });
 
 export const fetchUpcomingActivities = async (): Promise<Activity[]> => {
@@ -57,6 +76,28 @@ export const fetchActivityById = async (
   }
 
   return data ? mapActivity(data as ActivityRow) : null;
+};
+
+export const updateActivity = async (
+  activityId: string,
+  payload: CreateActivityPayload
+): Promise<Activity> => {
+  const { data, error } = await supabase
+    .from('activities')
+    .update(payload)
+    .eq('id', activityId)
+    .select(ACTIVITY_SELECT)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!data) {
+    throw new Error('Failed to load the updated activity');
+  }
+
+  return mapActivity(data as ActivityRow);
 };
 
 export const createActivity = async (
@@ -138,7 +179,6 @@ export const deleteActivity = async (activityId: string): Promise<void> => {
     throw new Error(participantsError.message);
   }
 
-  console.log(activityId);
   const { error } = await supabase
     .from('activities')
     .delete()

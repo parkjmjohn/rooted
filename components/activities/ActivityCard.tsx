@@ -7,9 +7,11 @@ import {
   GestureResponderEvent,
 } from 'react-native';
 
-import { Colors } from '../constants/Colors';
-import { Theme } from '../constants/Theme';
-import { Activity } from '../lib/types/activity';
+import ParticipantAvatarStack from '../avatar/ParticipantAvatarStack';
+import { formatDateTime } from '../../lib/utils/formatDateTime';
+import { Colors } from '../../constants/Colors';
+import { Theme } from '../../constants/Theme';
+import { Activity } from '../../lib/types/activity';
 
 interface ActivityCardProps {
   activity: Activity;
@@ -26,9 +28,14 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, onPress }) => {
       <View style={styles.card}>
         <Text style={styles.activityName}>{activity.name}</Text>
         <Text style={styles.meta}>{activity.sport}</Text>
+        <Text style={styles.time}>{formatDateTime(activity.time)}</Text>
         {activity.details ? (
           <Text style={styles.details}>{activity.details}</Text>
         ) : null}
+        <ParticipantAvatarStack
+          participants={activity.activity_participants}
+          style={styles.avatarSpacing}
+        />
       </View>
     </TouchableOpacity>
   );
@@ -39,6 +46,9 @@ const styles = StyleSheet.create({
     fontSize: Theme.typography.h3.fontSize,
     fontWeight: Theme.typography.h3.fontWeight,
     marginBottom: Theme.spacing.xs,
+  },
+  avatarSpacing: {
+    marginTop: Theme.spacing.sm,
   },
   card: {
     borderColor: Colors.border,
@@ -54,6 +64,11 @@ const styles = StyleSheet.create({
   meta: {
     color: Colors.textSecondary,
     fontSize: Theme.typography.caption.fontSize,
+  },
+  time: {
+    color: Colors.text,
+    fontSize: Theme.typography.caption.fontSize,
+    marginTop: Theme.spacing.xs,
   },
 });
 

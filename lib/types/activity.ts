@@ -8,15 +8,24 @@ export type ActivitySport =
 
 export type ActivityRole = 'host' | 'participant';
 
+export interface ParticipantProfile {
+  id: string;
+  full_name: string | null;
+  username: string | null;
+  avatar_url: string | null;
+}
+
 export interface ActivityParticipant {
   user_id: string;
   role: ActivityRole;
   joined_at: string;
+  profile?: ParticipantProfile;
 }
 
 export interface Activity {
   id: string;
   name: string;
+  time: string;
   sport: ActivitySport;
   completed: boolean;
   details: string | null;

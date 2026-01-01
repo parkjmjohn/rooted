@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Colors } from '../constants/Colors';
-import { Theme } from '../constants/Theme';
-import { Activity } from '../lib/types/activity';
+import { Colors } from '../../constants/Colors';
+import { Theme } from '../../constants/Theme';
+import { Activity } from '../../lib/types/activity';
 
 interface ActivitySectionProps {
   title: string;

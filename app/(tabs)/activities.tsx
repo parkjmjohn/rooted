@@ -19,9 +19,9 @@ import {
 } from '../../lib/activities';
 import { Activity } from '../../lib/types/activity';
 import { useAppSelector } from '../../lib/store';
-import ActivitySection from '../../components/ActivitySection';
-import ActivityCard from '../../components/ActivityCard';
-import ActivityModal from '../../components/ActivityModal';
+import ActivitySection from '../../components/activities/ActivitySection';
+import ActivityCard from '../../components/activities/ActivityCard';
+import ActivityModal from '../../components/activities/ActivityModal';
 import ActivityDetailsModal from '../../components/activities/ActivityDetailsModal';
 
 const ActivitiesScreen = () => {
@@ -33,6 +33,7 @@ const ActivitiesScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [detailsActivity, setDetailsActivity] = useState<Activity | null>(null);
   const [detailsVisible, setDetailsVisible] = useState(false);
+  const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
 
   const loadActivities = async () => {
     setLoading(true);
@@ -132,6 +133,20 @@ const ActivitiesScreen = () => {
     setDetailsActivity(null);
   };
 
+  const openEdit = (activity: Activity) => {
+    closeDetails();
+    setEditingActivity(activity);
+  };
+
+  const closeEditModal = () => {
+    setEditingActivity(null);
+  };
+
+  const handleActivityUpdated = async () => {
+    await loadActivities();
+    closeEditModal();
+  };
+
   if (!userId) {
     return (
       <View style={styles.container}>
@@ -153,12 +168,20 @@ const ActivitiesScreen = () => {
         onClose={() => setModalVisible(false)}
         onCreated={handleCreated}
       />
+      <ActivityModal
+        visible={!!editingActivity}
+        hostId={userId}
+        onClose={closeEditModal}
+        activity={editingActivity}
+        onSaved={handleActivityUpdated}
+      />
       <ActivityDetailsModal
         visible={detailsVisible}
         activity={detailsActivity}
         onClose={closeDetails}
         onJoin={handleJoin}
         onLeave={handleLeave}
+        onEdit={openEdit}
         userId={userId ?? null}
         actionActivityId={activityId}
       />
