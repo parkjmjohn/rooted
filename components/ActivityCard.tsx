@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   GestureResponderEvent,
 } from 'react-native';
-import { Button } from '@rneui/themed';
 
 import { Colors } from '../constants/Colors';
 import { Theme } from '../constants/Theme';
@@ -14,21 +13,10 @@ import { Activity } from '../lib/types/activity';
 
 interface ActivityCardProps {
   activity: Activity;
-  showJoin: boolean;
-  joining: boolean;
-  onJoin: (activity: Activity) => void;
-  onLeave: (activity: Activity) => void;
   onPress?: (event: GestureResponderEvent) => void;
 }
 
-const ActivityCard: React.FC<ActivityCardProps> = ({
-  activity,
-  showJoin,
-  joining,
-  onJoin,
-  onLeave,
-  onPress,
-}) => {
+const ActivityCard: React.FC<ActivityCardProps> = ({ activity, onPress }) => {
   return (
     <TouchableOpacity
       disabled={!onPress}
@@ -41,24 +29,6 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
         {activity.details ? (
           <Text style={styles.details}>{activity.details}</Text>
         ) : null}
-        {showJoin ? (
-          <View style={styles.cardActions}>
-            <Button
-              title={'Join activity'}
-              type="outline"
-              onPress={() => onJoin(activity)}
-              disabled={joining}
-            />
-          </View>
-        ) : (
-          <View style={styles.cardActions}>
-            <Button
-              title={'Leave activity'}
-              type="outline"
-              onPress={() => onLeave(activity)}
-            />
-          </View>
-        )}
       </View>
     </TouchableOpacity>
   );
@@ -77,9 +47,6 @@ const styles = StyleSheet.create({
     marginBottom: Theme.spacing.sm,
     padding: Theme.spacing.md,
     ...Theme.shadows.small,
-  },
-  cardActions: {
-    marginTop: Theme.spacing.sm,
   },
   details: {
     marginTop: Theme.spacing.xs,

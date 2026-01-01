@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Button } from '@rneui/themed';
 
 import { Colors } from '../../constants/Colors';
 import { Theme } from '../../constants/Theme';
@@ -16,6 +17,10 @@ interface ActivityDetailsModalProps {
   visible: boolean;
   activity: Activity | null;
   onClose: () => void;
+  onJoin: (activity: Activity) => void;
+  onLeave: (activity: Activity) => void;
+  userId: string | null;
+  actionActivityId: string | null;
 }
 
 const formatDateTime = (value: string) =>
@@ -31,10 +36,34 @@ const ActivityDetailsModal: React.FC<ActivityDetailsModalProps> = ({
   visible,
   activity,
   onClose,
+  onJoin,
+  onLeave,
+  userId,
+  actionActivityId,
 }) => {
   if (!activity) {
     return null;
   }
+
+  const isHost = !!userId && activity.host_id === userId;
+  const isParticipant =
+    !!userId && activity.activity_participants?.some(p => p.user_id === userId);
+  const actionInProgress = actionActivityId === activity.id;
+
+  let actionLabel = 'Join activity';
+  let actionHandler = () => onJoin(activity);
+  const actionType: 'solid' | 'outline' =
+    isHost || isParticipant ? 'outline' : 'solid';
+
+  if (isHost) {
+    actionLabel = 'Cancel event';
+    actionHandler = () => onLeave(activity);
+  } else if (isParticipant) {
+    actionLabel = 'Leave activity';
+    actionHandler = () => onLeave(activity);
+  }
+
+  const showActionButton = !!userId;
 
   return (
     <Modal visible={visible} animationType="fade" transparent>
@@ -66,6 +95,18 @@ const ActivityDetailsModal: React.FC<ActivityDetailsModalProps> = ({
               {formatDateTime(activity.created_at)}
             </Text>
           </ScrollView>
+
+          {showActionButton && (
+            <View style={styles.actions}>
+              <Button
+                title={actionLabel}
+                type={actionType}
+                onPress={actionHandler}
+                loading={actionInProgress}
+                disabled={actionInProgress}
+              />
+            </View>
+          )}
         </View>
       </View>
     </Modal>
@@ -73,6 +114,11 @@ const ActivityDetailsModal: React.FC<ActivityDetailsModalProps> = ({
 };
 
 const styles = StyleSheet.create({
+  actions: {
+    borderTopColor: Colors.border,
+    borderTopWidth: 1,
+    padding: Theme.spacing.md,
+  },
   backdrop: {
     alignItems: 'center',
     backgroundColor: Colors.overlay,

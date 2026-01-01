@@ -141,6 +141,8 @@ create policy "Users can create activities they host" on public.activities
   for insert with check (auth.uid() = host_id);
 create policy "Hosts can update their activities" on public.activities
   for update using (auth.uid() = host_id);
+create policy "Hosts can delete activities" on public.activities
+  for delete using (auth.uid() = host_id);
 
 alter table public.activity_participants enable row level security;
 create policy "Participants are viewable by authenticated users" on public.activity_participants
@@ -163,3 +165,4 @@ create policy "Anyone can upload an avatar." on storage.objects
   for insert with check (bucket_id = 'avatars');
 create policy "Anyone can update their own avatar." on storage.objects
   for update using ((select auth.uid()) = owner) with check (bucket_id = 'avatars');
+

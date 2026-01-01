@@ -124,7 +124,27 @@ export const leaveActivity = async (
     .match({ activity_id: activityId, user_id: userId });
 
   if (error) {
-    console.log('cant delete');
+    throw new Error(error.message);
+  }
+};
+
+export const deleteActivity = async (activityId: string): Promise<void> => {
+  const { error: participantsError } = await supabase
+    .from('activity_participants')
+    .delete()
+    .eq('activity_id', activityId);
+
+  if (participantsError) {
+    throw new Error(participantsError.message);
+  }
+
+  console.log(activityId);
+  const { error } = await supabase
+    .from('activities')
+    .delete()
+    .eq('id', activityId);
+
+  if (error) {
     throw new Error(error.message);
   }
 };

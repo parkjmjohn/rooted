@@ -15,6 +15,7 @@ import {
   fetchUpcomingActivities,
   joinActivity,
   leaveActivity,
+  deleteActivity,
 } from '../../lib/activities';
 import { Activity } from '../../lib/types/activity';
 import { useAppSelector } from '../../lib/store';
@@ -81,6 +82,7 @@ const ActivitiesScreen = () => {
       }
       await joinActivity(activity.id, userId);
       await loadActivities();
+      closeDetails();
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Failed to join activity.';
@@ -91,17 +93,26 @@ const ActivitiesScreen = () => {
   };
 
   const handleLeave = async (activity: Activity) => {
+    const isHost = !!userId && activity.host_id === userId;
     setActivityId(activity.id);
     try {
       if (!userId) {
         throw new Error('You must be logged in to leave an activity.');
       }
-      await leaveActivity(activity.id, userId);
+      if (isHost) {
+        await deleteActivity(activity.id);
+      } else {
+        await leaveActivity(activity.id, userId);
+      }
       await loadActivities();
+      closeDetails();
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to leave activity.';
-      Alert.alert('Leave failed', message);
+      const defaultMessage = isHost
+        ? 'Failed to cancel event.'
+        : 'Failed to leave activity.';
+      const message = err instanceof Error ? err.message : defaultMessage;
+      const alertTitle = isHost ? 'Cancel failed' : 'Leave failed';
+      Alert.alert(alertTitle, message);
     } finally {
       setActivityId(null);
     }
@@ -146,6 +157,10 @@ const ActivitiesScreen = () => {
         visible={detailsVisible}
         activity={detailsActivity}
         onClose={closeDetails}
+        onJoin={handleJoin}
+        onLeave={handleLeave}
+        userId={userId ?? null}
+        actionActivityId={activityId}
       />
       <View style={styles.header}>
         <View>
@@ -176,10 +191,6 @@ const ActivitiesScreen = () => {
               <ActivityCard
                 key={activity.id}
                 activity={activity}
-                showJoin={false}
-                joining={false}
-                onJoin={handleJoin}
-                onLeave={handleLeave}
                 onPress={() => openDetails(activity)}
               />
             )}
@@ -191,10 +202,6 @@ const ActivitiesScreen = () => {
               <ActivityCard
                 key={activity.id}
                 activity={activity}
-                showJoin={true}
-                joining={activityId === activity.id}
-                onJoin={handleJoin}
-                onLeave={handleLeave}
                 onPress={() => openDetails(activity)}
               />
             )}
