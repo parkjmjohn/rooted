@@ -30,7 +30,7 @@ interface ActivityModalProps {
   onClose: () => void;
   onCreated?: (activity: Activity) => void;
   activity?: Activity | null;
-  onSaved?: () => void;
+  onSaved?: (activity: Activity) => void;
 }
 
 const ActivityModal: React.FC<ActivityModalProps> = ({
@@ -112,8 +112,8 @@ const ActivityModal: React.FC<ActivityModalProps> = ({
 
       setSubmitting(true);
       if (isEditing && activity) {
-        await updateActivity(activity.id, payload);
-        onSaved?.();
+        const updatedActivity = await updateActivity(activity.id, payload);
+        onSaved?.(updatedActivity);
       } else {
         const createdActivity = await createActivity(payload, hostId);
         onCreated?.(createdActivity);

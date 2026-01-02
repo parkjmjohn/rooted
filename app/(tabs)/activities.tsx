@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,7 @@ import ActivitySection from '../../components/activities/ActivitySection';
 import ActivityCard from '../../components/activities/ActivityCard';
 import ActivityModal from '../../components/activities/ActivityModal';
 import ActivityDetailsModal from '../../components/activities/ActivityDetailsModal';
+import { useRouter, useSegments } from 'expo-router';
 
 const ActivitiesScreen = () => {
   const userId = useAppSelector(s => s.auth.user?.id);
@@ -34,6 +35,20 @@ const ActivitiesScreen = () => {
   const [detailsActivity, setDetailsActivity] = useState<Activity | null>(null);
   const [detailsVisible, setDetailsVisible] = useState(false);
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
+  const [shouldReopenDetails, setShouldReopenDetails] = useState(false);
+  const router = useRouter();
+  const segments = useSegments();
+  const prevIsActivityRoute = useRef(false);
+
+  useEffect(() => {
+    const isActivityRoute = segments.some(segment => segment === 'activity');
+    const wasActivityRoute = prevIsActivityRoute.current;
+    if (shouldReopenDetails && !isActivityRoute && wasActivityRoute) {
+      setDetailsVisible(true);
+      setShouldReopenDetails(false);
+    }
+    prevIsActivityRoute.current = isActivityRoute;
+  }, [segments, shouldReopenDetails]);
 
   const loadActivities = async () => {
     setLoading(true);
@@ -128,9 +143,18 @@ const ActivitiesScreen = () => {
     setDetailsVisible(true);
   };
 
-  const closeDetails = () => {
+  const closeDetails = (options?: {
+    keepReopen?: boolean;
+    clearActivity?: boolean;
+  }) => {
     setDetailsVisible(false);
-    setDetailsActivity(null);
+    const keepActivity = options?.keepReopen && options.clearActivity === false;
+    if (!keepActivity) {
+      setDetailsActivity(null);
+    }
+    if (!options?.keepReopen) {
+      setShouldReopenDetails(false);
+    }
   };
 
   const openEdit = (activity: Activity) => {
@@ -142,9 +166,21 @@ const ActivitiesScreen = () => {
     setEditingActivity(null);
   };
 
-  const handleActivityUpdated = async () => {
-    await loadActivities();
+  const handleActivityUpdated = (updatedActivity: Activity) => {
+    setActivities(prev =>
+      prev.map(activity =>
+        activity.id === updatedActivity.id ? updatedActivity : activity
+      )
+    );
     closeEditModal();
+  };
+
+  const handleViewParticipants = (activity: Activity) => {
+    globalThis.setTimeout(() => {
+      router.push(`/activity/${activity.id}/participants`);
+    }, 0);
+    setShouldReopenDetails(true);
+    closeDetails({ keepReopen: true, clearActivity: false });
   };
 
   if (!userId) {
@@ -184,6 +220,7 @@ const ActivitiesScreen = () => {
         onEdit={openEdit}
         userId={userId ?? null}
         actionActivityId={activityId}
+        onViewParticipants={handleViewParticipants}
       />
       <View style={styles.header}>
         <View>

@@ -24,6 +24,7 @@ interface ActivityDetailsModalProps {
   onEdit?: (activity: Activity) => void;
   userId: string | null;
   actionActivityId: string | null;
+  onViewParticipants?: (activity: Activity) => void;
 }
 
 const ActivityDetailsModal: React.FC<ActivityDetailsModalProps> = ({
@@ -35,6 +36,7 @@ const ActivityDetailsModal: React.FC<ActivityDetailsModalProps> = ({
   onEdit,
   userId,
   actionActivityId,
+  onViewParticipants,
 }) => {
   if (!activity) {
     return null;
@@ -44,6 +46,7 @@ const ActivityDetailsModal: React.FC<ActivityDetailsModalProps> = ({
   const isParticipant =
     !!userId && activity.activity_participants?.some(p => p.user_id === userId);
   const actionInProgress = actionActivityId === activity.id;
+  const participantCount = activity.activity_participants?.length ?? 0;
 
   let actionLabel = 'Join activity';
   let actionHandler = () => onJoin(activity);
@@ -71,9 +74,18 @@ const ActivityDetailsModal: React.FC<ActivityDetailsModalProps> = ({
             </TouchableOpacity>
           </View>
           <View style={styles.avatarRow}>
-            <ParticipantAvatarStack
-              participants={activity.activity_participants}
-            />
+            <TouchableOpacity
+              style={styles.participantsButton}
+              activeOpacity={0.75}
+              onPress={() => onViewParticipants?.(activity)}
+            >
+              <ParticipantAvatarStack
+                participants={activity.activity_participants}
+              />
+              <Text style={styles.participantsLink}>
+                View {participantCount === 1 ? 'participant' : 'participants'}
+              </Text>
+            </TouchableOpacity>
           </View>
 
           <ScrollView
@@ -165,6 +177,14 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     fontSize: Theme.typography.caption.fontSize,
     marginTop: Theme.spacing.md,
+  },
+  participantsButton: {
+    alignItems: 'flex-start',
+  },
+  participantsLink: {
+    color: Colors.primary,
+    fontWeight: '600',
+    marginTop: Theme.spacing.xs,
   },
   secondaryButton: {
     marginBottom: Theme.spacing.sm,
